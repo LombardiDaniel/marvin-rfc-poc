@@ -1,0 +1,23 @@
+prediction_preparator:
+    description: formatacao dos dados
+    notebookPath: /usr/notebooks/predicton_preparator.ipynb
+    # envVars:
+    #     DATE_BEGIN: 10/10/2021
+    #     DATE_END: 10/10/2022
+    # fileDependencies:
+    #     - "*.csv"
+    #     - "data_imports.txt"
+    fileOutputs:
+        - "formated.csv"
+
+predictor:
+    description: predicao e upload
+    notebookPath: /usr/notebooks/predicton_preparator.ipynb
+    envVars:
+        !DB_ENDPOINT_URL: http://firestore # quer dizer que NAO PODE MODIFICAR essa var
+        # DB_KEY: 123456789
+        DB_KEY: * # quer dizer que DB_KEY *PRECISA* ser definido no arquivo de pipeline
+    fileDependencies:
+        - "formated.csv"
+    # fileOutputs:
+    #     - "formated.csv"

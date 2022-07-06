@@ -1,0 +1,83 @@
+acquisitor:
+    description: adquiricao e formatacao basica dos dados
+    notebookPath: /usr/notebooks/acquisitor.ipynb
+    envVars:
+        DATE_BEGIN: 10/10/2021
+        DATE_END: 10/10/2022
+    fileDependencies:
+        - "*.csv"
+        - "data_imports.txt"
+    fileOutputs:
+        - "formated.csv"
+    varsOutput:
+        - isNovember
+
+
+trainingprep_november:
+    description: preparacao dos dados
+    # conditionForActivation: |
+    #     # This scope has access to all variables defined in previous pipeline step.
+    #     # Must return a bool.
+    #
+    #     from datetime import datetime
+    #     if datetime.now().month == 10:
+    #         return True
+    #
+    #     return False
+
+    notebookPath: /usr/notebooks/trainingprep_november.ipynb
+    # envVars:
+    #     DATE_BEGIN: 10/10/2021
+    #     DATE_END: 10/10/2022
+    fileDependencies:
+        # By default, all previous outputs from past
+        #   components are already available
+        - "*.csv"
+        - "data_imports.txt"
+    fileOutputs:
+        - "formated.csv"
+
+trainingprep_other_months:
+    description: preparacao dos dados
+    conditionForActivation: "return !isNovember" # variable 'isNovember' must be define in previous step of pipeline
+    notebookPath: /usr/notebooks/trainingprep_other_months.ipynb
+    # envVars:
+    #     DATE_BEGIN: 10/10/2021
+    #     DATE_END: 10/10/2022
+    fileDependencies:
+        # By default, all previous outputs from past
+        #   components are already available
+        - "*.csv"
+        - "data_imports.txt"
+    fileOutputs:
+        - "formated.csv"
+
+trainingprep_logger:
+    description: loga quantidade de entradas do mes
+    # conditionForActivation: "return !isNovember" # variable 'isNovember' must be define in previous step of pipeline
+    notebookPath: ./notebooks/trainingprep_logger.ipynb
+    envVars:
+        DB_ENDPOINT_URL: http://postgres
+        DB_KEY: 123456789
+    fileDependencies:
+        # By default, all previous outputs from past
+        #   components are already available
+        - "*.csv"
+        - "data_imports.txt"
+
+training:
+    description: treinamento do modelo
+    notebookPath: /usr/notebooks/train.ipynb
+    # envVars:
+    #     DATE_BEGIN: 10/10/2021
+    #     DATE_END: 10/10/2022
+    fileDependencies:
+        - "formated.csv"
+    # fileOutputs:
+    #     - "*.orm"
+
+# NAO FAZ MAIS SENTIDO!!!
+# deploy_e_predictor:
+#     description: deploy e predicao para atualizar a db
+#     pipelinePath: ./other/predict.yaml # -> NAO FAZ MAIS SENTIDO!!!
+#     # all current envVars will be overwriten by the new pipeline imported
