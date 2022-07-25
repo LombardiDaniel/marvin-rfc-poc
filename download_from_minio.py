@@ -3,7 +3,7 @@ import os
 from minio import Minio
 
 
-def download(url, access_key, secret_key, bucket_name, secure=False, verbose=False):
+def download(url, access_key, secret_key, bucket_name, secure=False, verbose=False, items_list=[]):
     client = Minio(
         url,
         access_key=access_key,
@@ -23,4 +23,5 @@ if __name__ == '__main__':
         os.getenv('MINIO_ACCESS_KEY'),
         os.getenv('MINIO_SECRET_KEY'),
         os.getenv('BUCKET_NAME'),
+        os.getenv('ITEMS_LIST').split(',')
     )
