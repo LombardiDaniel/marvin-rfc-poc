@@ -3,7 +3,7 @@ import os
 from minio import Minio
 
 
-def download(url, access_key, secret_key, bucket_name, secure=False, verbose=False, items_list=[]):
+def download(url, access_key, secret_key, bucket_name, items_list=[], secure=False, verbose=False):
     client = Minio(
         url,
         access_key=access_key,
