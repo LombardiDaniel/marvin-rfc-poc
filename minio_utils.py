@@ -32,11 +32,12 @@ class MinioUtils:
         self.bucket_name = bucket_name
         self.secure = secure
 
-    def download(self, url, items_list=[], verbose=False):
+    def download(self, items_list=[], verbose=False):
         client = Minio(
             self.url,
             access_key=self.access_key,
             secret_key=self.secret_key,
+            secure=False
         )
 
         # for item in client.list_objects(self.bucket_name, recursive=True):
@@ -49,7 +50,7 @@ class MinioUtils:
                 file_path=item  # local path to download
             )
 
-    def upload(self, url, items_list=[], verbose=False):
+    def upload(self, items_list=[], verbose=False):
         client = Minio(
             self.url,
             access_key=self.access_key,
