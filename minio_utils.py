@@ -79,7 +79,7 @@ if __name__ == '__main__':
     # print(args.op)
     # print(args.items)
 
-    mino = MinioUtils(
+    minio = MinioUtils(
         os.getenv('MINIO_ENDPOINT'),
         os.getenv('MINIO_ACCESS_KEY'),
         os.getenv('MINIO_SECRET_KEY'),
