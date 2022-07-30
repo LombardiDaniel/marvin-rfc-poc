@@ -60,7 +60,7 @@ class MinioUtils:
 
         for item_path in items_list:
             if verbose:
-                print('Uploading: ', item)
+                print('Uploading: ', item_path)
 
             client.fput_object(
                 self.bucket_name,

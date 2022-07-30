@@ -37,7 +37,7 @@ class ContainerWrapper:
             download_command = ContainerWrapper.COMMAND + 'download '
             for file in self.file_inputs:
                 download_command += f' {file} '
-            download_command += '-v' if self.verbose else ''
+            download_command += '-v && ' if self.verbose else ' && '
 
         if self.file_outputs != []:
             upload_command = f' && python {ContainerWrapper.SCRIPT_NAME} upload '
