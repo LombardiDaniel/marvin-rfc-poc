@@ -39,13 +39,14 @@ class MinioUtils:
             secret_key=self.secret_key,
         )
 
-        for item in client.list_objects(bucket_name, recursive=True):
+        # for item in client.list_objects(self.bucket_name, recursive=True):
+        for item in items_list:
             if verbose:
-                print('Downloading: ', item.object_name, 'to: ', item.object_name)
+                print('Downloading: ', item)
             client.fget_object(
                 self.bucket_name,
-                item.object_name,
-                item.object_name
+                item,
+                item
             )
 
     def upload(self, url, upload_path, items_list=[], verbose=False):
