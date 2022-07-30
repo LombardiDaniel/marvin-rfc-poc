@@ -45,11 +45,11 @@ class MinioUtils:
                 print('Downloading: ', item)
             client.fget_object(
                 self.bucket_name,
-                item,
-                item
+                object_name=item,  # path in minio
+                file_path=item  # local path to download
             )
 
-    def upload(self, url, upload_path, items_list=[], verbose=False):
+    def upload(self, url, items_list=[], verbose=False):
         client = Minio(
             self.url,
             access_key=self.access_key,
@@ -59,11 +59,11 @@ class MinioUtils:
 
         for item_path in items_list:
             if verbose:
-                print('Downloading: ', item.object_name, 'to: ', item.object_name)
+                print('Uploading: ', item)
 
             client.fput_object(
                 self.bucket_name,
-                upload_path + item_path.split('/')[-1],
+                item_path,
                 item_path
             )
 
