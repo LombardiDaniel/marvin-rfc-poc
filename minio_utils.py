@@ -35,7 +35,7 @@ class MinioUtils:
     def download(self, url, items_list=[], verbose=False):
         client = Minio(
             self.url,
-            access_key=self.ccess_key,
+            access_key=self.access_key,
             secret_key=self.secret_key,
         )
 
