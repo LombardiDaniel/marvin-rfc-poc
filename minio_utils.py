@@ -32,7 +32,7 @@ class MinioUtils:
         self.bucket_name = bucket_name
         self.secure = secure
 
-    def download(url, items_list=[], verbose=False):
+    def download(self, url, items_list=[], verbose=False):
         client = Minio(
             self.url,
             access_key=aself.ccess_key,
@@ -48,7 +48,7 @@ class MinioUtils:
                 item.object_name
             )
 
-    def upload(url, upload_path, items_list=[], verbose=False):
+    def upload(self, url, upload_path, items_list=[], verbose=False):
         client = Minio(
             self.url,
             access_key=self.access_key,
