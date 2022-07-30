@@ -58,14 +58,14 @@ class MinioUtils:
             secure=self.secure
         )
 
-        for item_path in items_list:
+        for item in items_list:
             if verbose:
-                print('Uploading: ', item_path)
+                print('Uploading: ', item)
 
             client.fput_object(
                 self.bucket_name,
-                item_path,
-                item_path
+                item,
+                item
             )
 
 
