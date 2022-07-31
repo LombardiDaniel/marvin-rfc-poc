@@ -23,8 +23,8 @@ import argparse
 from minio import Minio
 
 
-def log(text):
-    print(f'[INFO][MinioUtils]::{text}')
+def log(*args, **kwargs):
+    print(f'[INFO][MinioUtils]::', *args, **kwargs)
 
 
 class MinioUtils:

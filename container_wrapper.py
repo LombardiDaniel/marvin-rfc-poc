@@ -13,7 +13,6 @@ class ContainerWrapper:
         - image (str) : accesible docker image URI to be used in the container
         - env_vars (list) : enviornment variables to be safely passed to the container
         - verbose (bool) : if True will announce steps in stdout
-        - setup_command (str) : command to be used in the creation of the container
         - usr_setup (str) : setup command defined by the user
     '''
 
@@ -23,16 +22,16 @@ class ContainerWrapper:
     COMMAND = '/usr/local/bin/python -m pip install --upgrade pip'
     COMMAND += 'pip install minio && '
     COMMAND += f'curl {MINIO_SCRIPT_URL} -o {SCRIPT_NAME} && '
-    COMMAND_ENDING = f' && python {SCRIPT_NAME} '
+    COMMAND += f'python {SCRIPT_NAME} '
 
-    @property
-    def setup_command(self):
-        '''
-        Setup command will run on every container (eg: 'pip install -r requirements.txt')
-        or wtvr else is specified by the user.
-        '''
-        setup_command = ContainerWrapper.COMMAND + self.usr_setup + ContainerWrapper.COMMAND_ENDING
-        return setup_command
+    # @property
+    # def setup_command(self):
+    #     '''
+    #     Setup command will run on every container (eg: 'pip install -r requirements.txt')
+    #     or wtvr else is specified by the user.
+    #     '''
+    #     setup_command = ContainerWrapper.COMMAND + self.usr_setup + ' && '
+    #     return setup_command
 
     def __init__(self,
                  name='name',
@@ -69,7 +68,7 @@ class ContainerWrapper:
         upload_command = ''
 
         if self.file_inputs != []:
-            download_command = self.setup_command + 'download '
+            download_command = ContainerWrapper.COMMAND + 'download '
             for file in self.file_inputs:
                 download_command += f' {file} '
             download_command += '-v && ' if self.verbose else ' && '
@@ -81,6 +80,7 @@ class ContainerWrapper:
             upload_command += '-v' if self.verbose else ''
 
         final_command = download_command
+        final_command += self.usr_setup + (' && ' if self.usr_setup != '' else ' ')
         final_command += script_to_wrap
         final_command += upload_command
 
