@@ -7,7 +7,13 @@ class ContainerWrapper:
     Wrapper for dsl.ContainerOp. Already manages file parsing through pipeline steps.
 
     Attributes:
-        - name:
+        - name (str) : Component name used in the ContainerOp creation
+        - file_inputs (list) : files that the container will download before running user's command
+        - file_outputs (list) : files that the container will upload after running user's command
+        - image (str) : accesible docker image URI to be used in the container
+        - env_vars (list) : enviornment variables to be safely passed to the container
+        - verbose (bool) : if True will announce steps in stdout
+        - setup_command (str) : command to be used in the creation of the container
     '''
 
     MINIO_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/minio_utils.py'
@@ -32,7 +38,7 @@ class ContainerWrapper:
                  image='python:3.7',
                  file_inputs=[],
                  file_outputs=[],
-                 setup='pip install -r requirements.txt',
+                 setup_command='pip install -r requirements.txt',
                  verbose=False,
                  *args,
                  **kwargs
@@ -43,11 +49,21 @@ class ContainerWrapper:
         self.env_vars = kwargs
         self.name = name
         self.verbose = verbose
-        self.setup = setup
+        self.setup = setup_command
 
     def run(self, script_to_wrap):
         '''
+        Creates the ContainerOp will all enviornment variables set by the user in the
+        __init__ method, all files scripted to be automatically downloaded and uploaded
+        by the pipeline steps:
+            setup -> download_files -> run_user_script -> upload_files
+        (files are managed via min.io/Amazon S3)
+
+        Args:
+            - script_to_wrap (str) : user's sript to run in the container (e.g.:
+            "python main.py > my_ouput_file.txt")
         '''
+
         download_command = ''
         upload_command = ''
 
