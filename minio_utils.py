@@ -23,6 +23,10 @@ import argparse
 from minio import Minio
 
 
+def log(text):
+    print(f'[INFO][MinioUtils]::{text}')
+
+
 class MinioUtils:
 
     def __init__(self, url, access_key, secret_key, bucket_name, secure=False):
@@ -43,7 +47,7 @@ class MinioUtils:
         # for item in client.list_objects(self.bucket_name, recursive=True):
         for item in items_list:
             if verbose:
-                print('Downloading: ', item)
+                log('Downloading: ', item)
             client.fget_object(
                 self.bucket_name,
                 object_name=item,  # path in minio
@@ -60,7 +64,7 @@ class MinioUtils:
 
         for item in items_list:
             if verbose:
-                print('Uploading: ', item)
+                log('Uploading: ', item)
 
             client.fput_object(
                 self.bucket_name,
