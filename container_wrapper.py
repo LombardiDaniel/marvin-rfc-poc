@@ -14,6 +14,7 @@ class ContainerWrapper:
         - env_vars (list) : enviornment variables to be safely passed to the container
         - verbose (bool) : if True will announce steps in stdout
         - setup_command (str) : command to be used in the creation of the container
+        - usr_setup (str) : setup command defined by the user
     '''
 
     MINIO_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/minio_utils.py'
@@ -22,7 +23,7 @@ class ContainerWrapper:
     COMMAND = '/usr/local/bin/python -m pip install --upgrade pip'
     COMMAND += 'pip install minio && '
     COMMAND += f'curl {MINIO_SCRIPT_URL} -o {SCRIPT_NAME} && '
-    COMMAND_ENDING += f' && python {SCRIPT_NAME} '
+    COMMAND_ENDING = f' && python {SCRIPT_NAME} '
 
     @property
     def setup_command(self):
@@ -30,7 +31,7 @@ class ContainerWrapper:
         Setup command will run on every container (eg: 'pip install -r requirements.txt')
         or wtvr else is specified by the user.
         '''
-        setup_command = ContainerWrapper.COMMAND + setup_command + COMMAND_ENDING
+        setup_command = ContainerWrapper.COMMAND + self.usr_setup + ContainerWrapper.COMMAND_ENDING
         return setup_command
 
     def __init__(self,
@@ -49,7 +50,7 @@ class ContainerWrapper:
         self.env_vars = kwargs
         self.name = name
         self.verbose = verbose
-        self.setup = setup_command
+        self.usr_setup = setup_command
 
     def run(self, script_to_wrap):
         '''
