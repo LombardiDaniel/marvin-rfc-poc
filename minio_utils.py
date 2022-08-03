@@ -97,3 +97,6 @@ if __name__ == '__main__':
 
     elif args.op == 'upload':
         minio.upload(args.items, verbose=args.verbose)
+
+
+# f"python download_utils.py {DOWNLOAD_ENGINE} download {ARQ}"

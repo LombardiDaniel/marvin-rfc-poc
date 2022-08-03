@@ -17,22 +17,14 @@ class ContainerWrapper:
         - export (list) : list of env vars that are convertable to int
     '''
 
+    # TODO: Colocar "pip install minio" em "pip install requirements.txt"
     MINIO_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/minio_utils.py'
     SCRIPT_NAME = '__script_for_minio_in_container.py'
 
-    COMMAND = '/usr/local/bin/python -m pip install --upgrade pip'
+    COMMAND = '/usr/local/bin/python -m pip install --upgrade pip && '
     COMMAND += 'pip install minio && '
     COMMAND += f'curl {MINIO_SCRIPT_URL} -o {SCRIPT_NAME} && '
     COMMAND += f'python {SCRIPT_NAME} '
-
-    # @property
-    # def setup_command(self):
-    #     '''
-    #     Setup command will run on every container (eg: 'pip install -r requirements.txt')
-    #     or wtvr else is specified by the user.
-    #     '''
-    #     setup_command = ContainerWrapper.COMMAND + self.usr_setup + ' && '
-    #     return setup_command
 
     def __init__(self,
                  name='name',
@@ -54,6 +46,7 @@ class ContainerWrapper:
         self.verbose = verbose
         self.usr_setup = setup_command
 
+        # TODO: Explicar pq isso precisa ta aqui
         for k, v in self.env_vars.items():
             try:
                 float(v)
