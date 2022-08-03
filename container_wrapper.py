@@ -14,6 +14,7 @@ class ContainerWrapper:
         - env_vars (list) : enviornment variables to be safely passed to the container
         - verbose (bool) : if True will announce steps in stdout
         - usr_setup (str) : setup command defined by the user
+        - export (list) : list of env vars that are convertable to int
     '''
 
     MINIO_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/minio_utils.py'
@@ -40,16 +41,34 @@ class ContainerWrapper:
                  file_outputs=[],
                  setup_command='pip install -r requirements.txt',
                  verbose=False,
-                 *args,
+                 env_vars={},
                  **kwargs
                  ):
+
         self.file_inputs = file_inputs
         self.file_outputs = file_outputs
         self.image = image
-        self.env_vars = kwargs
+        self.env_vars = {**env_vars, **kwargs}
+        self.export = []
         self.name = name
         self.verbose = verbose
         self.usr_setup = setup_command
+
+        for k, v in self.env_vars.items():
+            try:
+                float(v)
+            except ValueError:
+                continue
+            else:
+                self.export.append(
+                    {
+                        'key': k,
+                        'value': v
+                    }
+                )
+
+        for item in self.export:
+            del self.env_vars[item['key']]
 
     def run(self, script_to_wrap):
         '''
@@ -64,8 +83,12 @@ class ContainerWrapper:
             "python main.py > my_ouput_file.txt")
         '''
 
+        export_command = ''
         download_command = ''
         upload_command = ''
+
+        for item in self.export:
+            export_command += f'export "{item["key"]}"="{item["value"]}" && '
 
         if self.file_inputs != []:
             download_command = ContainerWrapper.COMMAND + 'download '
@@ -79,7 +102,8 @@ class ContainerWrapper:
                 upload_command += f' {file} '
             upload_command += '-v' if self.verbose else ''
 
-        final_command = download_command
+        final_command = export_command
+        final_command += download_command
         final_command += self.usr_setup + (' && ' if self.usr_setup != '' else ' ')
         final_command += script_to_wrap
         final_command += upload_command
@@ -96,7 +120,7 @@ class ContainerWrapper:
             container_op.container.add_env_variable(
                 V1EnvVar(
                     name=k,
-                    value=v
+                    value=str(v)
                 )
             )
 
