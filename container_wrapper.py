@@ -18,11 +18,15 @@ class ContainerWrapper:
     '''
 
     # TODO: Colocar "pip install minio" em "pip install requirements.txt"
+    # TODO: Trocar "minio" pra "S3"
     MINIO_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/minio_utils.py'
+    UTILS_REQUIREMENTS_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/__MINIO_UTILS_requirements.txt'
+    UTILS_REQUIREMENTS_NAME = '__MINIO_UTILS_requirements.txt'
     SCRIPT_NAME = '__script_for_minio_in_container.py'
 
     COMMAND = '/usr/local/bin/python -m pip install --upgrade pip && '
-    COMMAND += 'pip install minio && '
+    COMMAND += f'curl {UTILS_REQUIREMENTS} -o {__MINIO_UTILS_requirements} && '
+    COMMAND += f'pip install -r {UTILS_REQUIREMENTS} && '
     COMMAND += f'curl {MINIO_SCRIPT_URL} -o {SCRIPT_NAME} && '
     COMMAND += f'python {SCRIPT_NAME} '
 
