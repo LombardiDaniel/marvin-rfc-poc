@@ -178,6 +178,6 @@ def my_pipeline_name():
 if __name__ == '__main__':
     global BUCKET_NAME_VAR
 
-    BUCKET_NAME_VAR = get_valid_bucket_name()['name']
+    BUCKET_NAME_VAR = get_valid_bucket_name()
 
     kfp.compiler.Compiler().compile(my_pipeline_name, 'housing-prices_testing_WRAPPER.tar.gz')

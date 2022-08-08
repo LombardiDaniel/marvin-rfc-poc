@@ -17,6 +17,8 @@ Exemplo para upload:
 python s3_utils.py upload ./item1.py minhaPasta/item2.py texto.txt
 '''
 
+# TODO: Fix bucket name for allowed chars
+
 import secrets
 import os
 import argparse
@@ -49,7 +51,7 @@ class S3Utils:
     '''
 
     def __init__(self, url, access_key, secret_key, project_name='', secure=False, bucket_name=None):
-        self.project_name = project_name
+        self.project_name = project_name.replace('_', '-')
         self.url = url
         self.access_key = access_key
         self.secret_key = secret_key
