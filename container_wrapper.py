@@ -33,8 +33,8 @@ class ContainerWrapper:
     SCRIPT_NAME = '__script_for_s3_in_container.py'
 
     COMMAND = '/usr/local/bin/python -m pip install --upgrade pip && '
-    COMMAND += f'curl {UTILS_REQUIREMENTS} -o {UTILS_REQUIREMENTS_NAME} && '
-    COMMAND += f'pip install -r {UTILS_REQUIREMENTS} && '
+    COMMAND += f'curl {UTILS_REQUIREMENTS_URL} -o {UTILS_REQUIREMENTS_NAME} && '
+    COMMAND += f'pip install -r {UTILS_REQUIREMENTS_NAME} && '
     COMMAND += f'curl {S3_SCRIPT_URL} -o {SCRIPT_NAME} && '
     COMMAND += f'python {SCRIPT_NAME} '
 

@@ -4,7 +4,7 @@ Utilizacao:
 python s3_utils.py [OPERATION] [ITEMS] -v (optional)
 
 OPERATION : download | upload
-ITEMS : list of paths to files seperated by space (' ') - for both download and upload
+ITEMS : list of paths to files seperated by space (' '), for both download and upload
 -v : Verbose
 
 Exemplo pra download:
@@ -25,7 +25,7 @@ from minio import Minio
 
 
 def log(*args, **kwargs):
-    print(f'[INFO][MinioUtils]::', *args, **kwargs)
+    print('[INFO][MinioUtils]::', *args, **kwargs)
 
 
 class S3Utils:
@@ -130,11 +130,11 @@ if __name__ == '__main__':
     # print(args.op)
     # print(args.items)
 
-    minio = MinioUtils(
+    minio = S3Utils(
         os.getenv('S3_ENDPOINT'),
         os.getenv('S3_ACCESS_KEY'),
         os.getenv('S3_SECRET_KEY'),
-        os.getenv('BUCKET_NAME')
+        bucket_name=os.getenv('BUCKET_NAME')
     )
 
     if args.op == 'download':

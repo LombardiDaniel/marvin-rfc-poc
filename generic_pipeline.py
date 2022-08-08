@@ -2,11 +2,8 @@
 Generic pipeline to work as example. Also to later be used to generate jinja template.
 '''
 
-import secrets
-import os
-
 import kfp
-import kfp.components as comp
+# import kfp.components as comp
 from kfp import dsl
 
 from container_wrapper import ContainerWrapper as Container
@@ -21,20 +18,20 @@ MINIO_ACCESS_KEY_VAR = 'minio_key'
 MINIO_SECRET_KEY_VAR = 'minio_secret'
 BUCKET_NAME_VAR = 'my_bucket_name'  # generated using project name and hash from external?
 
+# TODO: need to calculate all files that need to be uploaded and upload before
+# first conainer is generated
 
 def get_valid_bucket_name():
     '''
     Gets a valid bucket name using hash token.
     '''
 
-    hash = secrets.token_urlsafe(16)
-    bucket_name = f"{PROJECT_NAME}_{hash}"
-
-    while client.bucket_exists(bucket_name):
-        hash = secrets.token_urlsafe(16)
-        bucket_name = f"{PROJECT_NAME}_{hash}"
-
-    return bucket_name
+    return S3Utils(
+        MINIO_ENDPOINT_VAR,
+        MINIO_ACCESS_KEY_VAR,
+        MINIO_SECRET_KEY_VAR,
+        project_name=PROJECT_NAME
+    ).create_bucket(try_new_hash=True)
 
 
 def create_container(**kwargs):
@@ -58,7 +55,7 @@ def setup_minio_pipeline_dependencies(files=[]):
     Manually sets up the minio objects for the first container.
     '''
 
-    minio = MinioUtils(
+    minio = S3Utils(
         MINIO_ENDPOINT_VAR,
         MINIO_ACCESS_KEY_VAR,
         MINIO_SECRET_KEY_VAR,
@@ -85,7 +82,7 @@ def acquisitor():
 
     # - UPLOADS DEPENDENCIES FOR PIPELINE (FRIST STEP) - #
     # User's computer must be able to access the S3 instance via the network
-    setup_minio_pipeline_dependencies(cointainer.file_inputs)
+    setup_minio_pipeline_dependencies(container.file_inputs)
 
     return container.run('python housing-prices/acquisitor.py')
 
@@ -177,8 +174,8 @@ def my_pipeline_name():
 
 
 if __name__ == '__main__':
-
     global BUCKET_NAME_VAR
-    BUCKET_NAME_VAR = get_valid_bucket_name()
+
+    BUCKET_NAME_VAR = get_valid_bucket_name()['name']
 
     kfp.compiler.Compiler().compile(my_pipeline_name, 'housing-prices_testing_WRAPPER.tar.gz')
