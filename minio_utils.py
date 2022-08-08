@@ -24,6 +24,10 @@ import argparse
 from minio import Minio
 
 
+def log(*args, **kwargs):
+    print(f'[INFO][MinioUtils]::', *args, **kwargs)
+
+
 class MinioUtils:
     '''
     ESCREVER ISSO AUQI
@@ -48,7 +52,7 @@ class MinioUtils:
         # for item in client.list_objects(self.bucket_name, recursive=True):
         for item in items_list:
             if verbose:
-                print('Downloading: ', item)
+                log('Downloading: ', item)
             client.fget_object(
                 self.bucket_name,
                 object_name=item,  # path in minio
@@ -65,7 +69,7 @@ class MinioUtils:
 
         for item in items_list:
             if verbose:
-                print('Uploading: ', item)
+                log('Uploading: ', item)
 
             client.fput_object(
                 self.bucket_name,
@@ -121,3 +125,6 @@ if __name__ == '__main__':
 
     elif args.op == 'upload':
         minio.upload(args.items, verbose=args.verbose)
+
+
+# f"python download_utils.py {DOWNLOAD_ENGINE} download {ARQ}"
