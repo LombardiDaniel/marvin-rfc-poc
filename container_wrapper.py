@@ -73,7 +73,7 @@ class ContainerWrapper:
                 )
 
         for item in self.export:
-            del self.env_vars[item['key']]
+            self.env_vars.pop(item['key'])
 
     def run(self, script_to_wrap):
         '''
