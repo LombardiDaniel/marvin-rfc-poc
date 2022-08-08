@@ -17,6 +17,7 @@ Exemplo para upload:
 python minio_utils.py upload ./item1.py minhaPasta/item2.py texto.txt
 '''
 
+import secrets
 import os
 import argparse
 
@@ -24,13 +25,17 @@ from minio import Minio
 
 
 class MinioUtils:
+    '''
+    ESCREVER ISSO AUQI
+    '''
 
-    def __init__(self, url, access_key, secret_key, bucket_name, secure=False):
+    def __init__(self, url, access_key, secret_key, project_name='', secure=False, bucket_name=None):
+        self.project_name = project_name
         self.url = url
         self.access_key = access_key
         self.secret_key = secret_key
-        self.bucket_name = bucket_name
         self.secure = secure
+        self.bucket_name = bucket_name  # if bucket_name is not None else ''
 
     def download(self, items_list=[], verbose=False):
         client = Minio(
@@ -67,6 +72,29 @@ class MinioUtils:
                 item,
                 item
             )
+
+    def create_bucket(self):
+        '''
+        '''
+
+        client = Minio(
+            self.url,
+            access_key=self.access_key,
+            secret_key=self.secret_key,
+            secure=self.secure
+        )
+
+        hash = secrets.token_urlsafe(16)
+        bucket_name_tmp = f"{self.project_name}_{hash}"
+
+        while client.bucket_exists(bucket_name_tmp):
+            hash = secrets.token_urlsafe(16)
+            bucket_name_tmp = f"{self.project_name}_{hash}"
+
+        client.make_bucket(bucket_name_tmp)
+
+        self.bucket_name = bucket_name_tmp
+        return self.bucket_name
 
 
 if __name__ == '__main__':

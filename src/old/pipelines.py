@@ -67,7 +67,7 @@ class MarvinPipeline:
                 self.executor = 'python'
 
             if exec_extension == '.ipynb':
-                self.executor = 'papermule'
+                self.executor = 'papermill'
 
         else:
             self.executor = kwargs['executor']
@@ -99,9 +99,9 @@ class MarvinPipeline:
         '''
 
         if 'notebookPath' in kwargs_dict:
-            if kwargs_dict['executor'] != 'papermule':
+            if kwargs_dict['executor'] != 'papermill':
                 raise ExecutorError(
-                    'Executor for Jupyter Notebooks must be "papermule"'
+                    'Executor for Jupyter Notebooks must be "papermill"'
                 )
 
         if 'fileDependencies' in kwargs_dict:
