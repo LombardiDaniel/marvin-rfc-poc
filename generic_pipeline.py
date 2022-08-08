@@ -18,8 +18,10 @@ MINIO_ACCESS_KEY_VAR = 'minio_key'
 MINIO_SECRET_KEY_VAR = 'minio_secret'
 BUCKET_NAME_VAR = 'my_bucket_name'  # generated using project name and hash from external?
 
+
 # TODO: need to calculate all files that need to be uploaded and upload before
 # first conainer is generated
+
 
 def get_valid_bucket_name():
     '''

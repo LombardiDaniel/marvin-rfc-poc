@@ -28,6 +28,8 @@ def log(*args, **kwargs):
     print('[INFO][MinioUtils]::', *args, **kwargs)
 
 
+HASH_SIZE = 16
+
 class S3Utils:
     '''
 
@@ -104,11 +106,11 @@ class S3Utils:
         )
 
         if try_new_hash:
-            hash = secrets.token_urlsafe(16)
+            hash = secrets.token_hex(int(HASH_SIZE / 2))
             bucket_name_tmp = f"{self.project_name}_{hash}"
 
             while client.bucket_exists(bucket_name_tmp):
-                hash = secrets.token_urlsafe(16)
+                hash = secrets.token_hex(int(HASH_SIZE / 2))
                 bucket_name_tmp = f"{self.project_name}_{hash}"
 
             self.bucket_name = bucket_name_tmp
