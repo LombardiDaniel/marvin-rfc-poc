@@ -1,3 +1,7 @@
+'''
+Containes a wrapper for dsl.ContainerOp. This should be used instead.
+'''
+
 from kfp import dsl
 from kubernetes.client.models import V1EnvVar
 
@@ -15,19 +19,23 @@ class ContainerWrapper:
         - verbose (bool) : if True will announce steps in stdout
         - usr_setup (str) : setup command defined by the user
         - export (list) : list of env vars that are convertable to int
+
+    Methods:
+        - run(script_to_wrap) : Generates the ContainerOp instance with all needed env vars (
+            BUG FIX: Any env var that is capable of being converted to floar/int will be exported using
+            bash export command.
+        ) and the user script
     '''
 
-    # TODO: Colocar "pip install minio" em "pip install requirements.txt"
-    # TODO: Trocar "minio" pra "S3"
-    MINIO_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/minio_utils.py'
-    UTILS_REQUIREMENTS_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/__MINIO_UTILS_requirements.txt'
-    UTILS_REQUIREMENTS_NAME = '__MINIO_UTILS_requirements.txt'
-    SCRIPT_NAME = '__script_for_minio_in_container.py'
+    S3_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/s3_utils.py'
+    UTILS_REQUIREMENTS_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/__S3_UTILS_requirements.txt'  # noqa: E501
+    UTILS_REQUIREMENTS_NAME = '__S3_UTILS_requirements.txt'
+    SCRIPT_NAME = '__script_for_s3_in_container.py'
 
     COMMAND = '/usr/local/bin/python -m pip install --upgrade pip && '
-    COMMAND += f'curl {UTILS_REQUIREMENTS} -o {__MINIO_UTILS_requirements} && '
+    COMMAND += f'curl {UTILS_REQUIREMENTS} -o {UTILS_REQUIREMENTS_NAME} && '
     COMMAND += f'pip install -r {UTILS_REQUIREMENTS} && '
-    COMMAND += f'curl {MINIO_SCRIPT_URL} -o {SCRIPT_NAME} && '
+    COMMAND += f'curl {S3_SCRIPT_URL} -o {SCRIPT_NAME} && '
     COMMAND += f'python {SCRIPT_NAME} '
 
     def __init__(self,

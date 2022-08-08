@@ -1,7 +1,7 @@
 '''
 Utilizacao:
 
-python minio_utils.py [OPERATION] [ITEMS] -v (optional)
+python s3_utils.py [OPERATION] [ITEMS] -v (optional)
 
 OPERATION : download | upload
 ITEMS : list of paths to files seperated by space (' ') - for both download and upload
@@ -9,12 +9,12 @@ ITEMS : list of paths to files seperated by space (' ') - for both download and 
 
 Exemplo pra download:
 
-python minio_utils.py download item1.py pastaDoMinio/item2.py texto.txt
+python s3_utils.py download item1.py pastaDoMinio/item2.py texto.txt
 
 
 Exemplo para upload:
 
-python minio_utils.py upload ./item1.py minhaPasta/item2.py texto.txt
+python s3_utils.py upload ./item1.py minhaPasta/item2.py texto.txt
 '''
 
 import secrets
@@ -28,9 +28,22 @@ def log(*args, **kwargs):
     print(f'[INFO][MinioUtils]::', *args, **kwargs)
 
 
-class MinioUtils:
+class S3Utils:
     '''
-    ESCREVER ISSO AUQI
+
+    Attributes:
+        - project_name (str) : Used to generate bucket_name (if needed)
+        - url (str) : S3 URI endpoint
+        - access_key (str) : S3 Access Key
+        - secret_key (str) : S3 Secret Key
+        - secure (bool) : True for https, False for http
+        - bucket_name (str) : S3 bucket name (may be generated or passed as argument by jinja2)
+
+    Methods:
+        - download(items_list=[], verbose=False) : downloads all objs from items_list to current dir
+        - upload(items_list=[], verbose=False) : uploads all objs from items_list to S3 bucket
+        - create_bucket(try_new_hash=False) : Creates the bucket, if try_new_hash is enabled, tries generating a new
+            hash in the case that the current bucket already exists
     '''
 
     def __init__(self, url, access_key, secret_key, project_name='', secure=False, bucket_name=None):
@@ -77,8 +90,10 @@ class MinioUtils:
                 item
             )
 
-    def create_bucket(self):
+    def create_bucket(self, try_new_hash=False):
         '''
+        Creates the bucket to be used in the project, it should already recieve
+        the bucket name with the project hash.
         '''
 
         client = Minio(
@@ -88,16 +103,18 @@ class MinioUtils:
             secure=self.secure
         )
 
-        hash = secrets.token_urlsafe(16)
-        bucket_name_tmp = f"{self.project_name}_{hash}"
-
-        while client.bucket_exists(bucket_name_tmp):
+        if try_new_hash:
             hash = secrets.token_urlsafe(16)
             bucket_name_tmp = f"{self.project_name}_{hash}"
 
-        client.make_bucket(bucket_name_tmp)
+            while client.bucket_exists(bucket_name_tmp):
+                hash = secrets.token_urlsafe(16)
+                bucket_name_tmp = f"{self.project_name}_{hash}"
 
-        self.bucket_name = bucket_name_tmp
+            self.bucket_name = bucket_name_tmp
+
+        client.make_bucket(self.bucket_name)
+
         return self.bucket_name
 
 
@@ -114,9 +131,9 @@ if __name__ == '__main__':
     # print(args.items)
 
     minio = MinioUtils(
-        os.getenv('MINIO_ENDPOINT'),
-        os.getenv('MINIO_ACCESS_KEY'),
-        os.getenv('MINIO_SECRET_KEY'),
+        os.getenv('S3_ENDPOINT'),
+        os.getenv('S3_ACCESS_KEY'),
+        os.getenv('S3_SECRET_KEY'),
         os.getenv('BUCKET_NAME')
     )
 
