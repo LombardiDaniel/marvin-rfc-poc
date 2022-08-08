@@ -30,6 +30,7 @@ def log(*args, **kwargs):
 
 HASH_SIZE = 16
 
+
 class S3Utils:
     '''
 
