@@ -35,6 +35,13 @@ HASH_SIZE = 16
 
 class S3Utils:
     '''
+    Utils for managing S3, will be used with abstract class later on.
+
+    General utilization:
+        - User defines bucket name, i.e.: "housing_prices_project"
+        - marvin engine will generate project path inside bucket, i.e.:
+            "2022_08_15_housing_prices_project_0e13aaa143ce", uses UID and
+            creation date
 
     Attributes:
         - project_name (str) : Used to generate bucket_name (if needed)
@@ -42,7 +49,8 @@ class S3Utils:
         - access_key (str) : S3 Access Key
         - secret_key (str) : S3 Secret Key
         - secure (bool) : True for https, False for http
-        - bucket_name (str) : S3 bucket name (may be generated or passed as argument by jinja2)
+        - bucket_name (str) : S3 bucket name
+        - bucket_path (str) : Project directory inside bucket (optional)
 
     Methods:
         - download(items_list=[], verbose=False) : downloads all objs from items_list to current dir
@@ -51,13 +59,22 @@ class S3Utils:
             hash in the case that the current bucket already exists
     '''
 
-    def __init__(self, url, access_key, secret_key, project_name='', secure=False, bucket_name=None):
+    def __init__(self,
+                 url,
+                 access_key,
+                 secret_key,
+                 project_name='',
+                 secure=False,
+                 bucket_name=None,
+                 bucket_path=''
+                 ):
         self.project_name = project_name.replace('_', '-')
         self.url = url
         self.access_key = access_key
         self.secret_key = secret_key
         self.secure = secure
-        self.bucket_name = bucket_name  # if bucket_name is not None else ''
+        self.bucket_name = bucket_name
+        self.bucket_path = bucket_path
 
     def download(self, items_list=[], verbose=False):
         client = Minio(
@@ -73,7 +90,7 @@ class S3Utils:
                 log('Downloading: ', item)
             client.fget_object(
                 self.bucket_name,
-                object_name=item,  # path in minio
+                object_name=os.path.join(bucket_path, item),  # path in s3
                 file_path=item  # local path to download
             )
 
@@ -91,8 +108,8 @@ class S3Utils:
 
             client.fput_object(
                 self.bucket_name,
-                item,
-                item
+                object_name=os.path.join(bucket_path, item),  # path in s3
+                file_path=item  # local path to download
             )
 
     def create_bucket(self, try_new_hash=False):
@@ -121,6 +138,36 @@ class S3Utils:
         client.make_bucket(self.bucket_name)
 
         return self.bucket_name
+
+    @staticmethod
+    def check_bucket_availability(bucket_name):
+        '''
+        Checks if the currently generated bucket_name is available (not currently used).
+        '''
+
+        client = Minio(
+            self.url,
+            access_key=self.access_key,
+            secret_key=self.secret_key,
+            secure=self.secure
+        )
+
+        return client.bucket_exists(bucket_name)
+
+    @staticmethod
+    def get_valid_uuid():
+        '''
+        '''
+
+        client = Minio(
+            self.url,
+            access_key=self.access_key,
+            secret_key=self.secret_key,
+            secure=self.secure
+        )
+
+        for item in client.list_objects(self.bucket_name, recursive=True):
+            pass
 
 
 if __name__ == '__main__':
