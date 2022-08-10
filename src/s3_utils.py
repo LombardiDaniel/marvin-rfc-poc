@@ -17,8 +17,7 @@ Exemplo para upload:
 python s3_utils.py upload ./item1.py minhaPasta/item2.py texto.txt
 '''
 
-# TODO: Fix bucket name for allowed chars
-
+import re
 import secrets
 import os
 import argparse
@@ -57,6 +56,8 @@ class S3Utils:
         - upload(items_list=[], verbose=False) : uploads all objs from items_list to S3 bucket
         - create_bucket(try_new_hash=False) : Creates the bucket, if try_new_hash is enabled, tries generating a new
             hash in the case that the current bucket already exists
+        - is_valid_bucket_name(bucket_name) : Checks that the bucket_name is of valid naming
+        - replace_invalid_bucket_name_chars(bucket_name) : replaces invalid chars with '-'
     '''
 
     def __init__(self,
@@ -68,12 +69,20 @@ class S3Utils:
                  bucket_name=None,
                  bucket_path=''
                  ):
-        self.project_name = project_name.replace('_', '-')
         self.url = url
         self.access_key = access_key
         self.secret_key = secret_key
         self.secure = secure
-        self.bucket_name = bucket_name
+
+        self.project_name = project_name
+
+        if S3Utils.is_valid_bucket_name(project_name):
+            self.bucket_name = bucket_name
+        else:
+            raise BaseException(
+                'Invalid bucket name. Please check: https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html'  # noqa: E501
+            )
+
         self.bucket_path = bucket_path
 
     def download(self, items_list=[], verbose=False):
@@ -140,46 +149,32 @@ class S3Utils:
         return self.bucket_name
 
     @staticmethod
-    def check_bucket_availability(bucket_name):
+    def replace_invalid_bucket_name_chars(bucket_name):
         '''
-        Checks if the currently generated bucket_name is available (not currently used).
-        '''
-
-        client = Minio(
-            self.url,
-            access_key=self.access_key,
-            secret_key=self.secret_key,
-            secure=self.secure
-        )
-
-        return client.bucket_exists(bucket_name)
-
-    def get_valid_uuid(self):
-        '''
-        # TODO: colocar a lib uuid python
+        Replaces any invalid chars with '-'.
         '''
 
-        client = Minio(
-            self.url,
-            access_key=self.access_key,
-            secret_key=self.secret_key,
-            secure=self.secure
-        )
+        valid_chars = 'abcdefghijklmnopqrstuvwxyz-.0123456789'
 
-        list_of_dirs = []
-        for item in client.list_objects(self.bucket_name, recursive=False):
-            if item.object_name[-1] == '/':
-                list_of_dirs.append(item.object_name[:-1])
+        invalid_lst = []
+        for char in bucket_name:
+            if char not in valid_chars:
+                invalid_lst.append(char)
 
-        hash = secrets.token_hex(int(HASH_SIZE / 2))
-        bucket_path_tmp = f"{self.bucket_path}_{hash}"
+        for char in invalid_lst:
+            bucket_name = bucket_name.replace(char, '-')
 
-        while bucket_path_tmp in list_of_dirs:
-            hash = secrets.token_hex(int(HASH_SIZE / 2))
-            bucket_path_tmp = f"{self.bucket_path}_{hash}"
+        return bucket_name
 
-        self.bucket_path = bucket_path_tmp
-        return hash
+    @staticmethod
+    def is_valid_bucket_name(bucket_name):
+        '''
+        Huge thanks to Zak:
+            - https://stackoverflow.com/questions/50480924/regex-for-s3-bucket-name
+        '''
+
+        match_ex = '(?!(^xn--|-s3alias$))^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$'
+        return not re.search(match_ex, bucket_name)
 
 
 if __name__ == '__main__':
@@ -198,7 +193,8 @@ if __name__ == '__main__':
         os.getenv('S3_ENDPOINT'),
         os.getenv('S3_ACCESS_KEY'),
         os.getenv('S3_SECRET_KEY'),
-        bucket_name=os.getenv('BUCKET_NAME')
+        bucket_name=os.getenv('BUCKET_NAME'),
+        bucket_path=os.getenv('BUCKET_PATH'),
     )
 
     if args.op == 'download':

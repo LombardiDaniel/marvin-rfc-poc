@@ -2,8 +2,10 @@
 Generic pipeline to work as example. Also to later be used to generate jinja template.
 '''
 
+import uuid
+from datetime import datetime
+
 import kfp
-# import kfp.components as comp
 from kfp import dsl
 
 from container_wrapper import ContainerWrapper as Container
@@ -17,23 +19,10 @@ MINIO_ENDPOINT_VAR = 'my_minio_uri.ai'
 MINIO_ACCESS_KEY_VAR = 'minio_key'
 MINIO_SECRET_KEY_VAR = 'minio_secret'
 BUCKET_NAME_VAR = 'my_bucket_name'  # generated using project name and hash from external?
-
+BUCKET_PATH = ''
 
 # TODO: need to calculate all files that need to be uploaded and upload before
 # first conainer is generated
-
-
-def get_valid_bucket_name():
-    '''
-    Gets a valid bucket name using hash token.
-    '''
-
-    return S3Utils(
-        MINIO_ENDPOINT_VAR,
-        MINIO_ACCESS_KEY_VAR,
-        MINIO_SECRET_KEY_VAR,
-        project_name=PROJECT_NAME
-    ).create_bucket(try_new_hash=True)
 
 
 def create_container(**kwargs):
@@ -48,6 +37,7 @@ def create_container(**kwargs):
         S3_ACCESS_KEY=MINIO_ACCESS_KEY_VAR,
         S3_SECRET_KEY=MINIO_SECRET_KEY_VAR,
         BUCKET_NAME=BUCKET_NAME_VAR,
+        BUCKET_PATH=BUCKET_PATH,
         **kwargs
     )
 
@@ -177,9 +167,16 @@ def housing_prices_pipeline():
 
 if __name__ == '__main__':
     global BUCKET_NAME_VAR
+    global PROJECT_NAME
+    global BUCKET_PATH
 
-    BUCKET_NAME_VAR = get_valid_bucket_name()
-    pipeline_file_path = f'{BUCKET_NAME_VAR}.yaml'
+    BUCKET_PATH = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
+
+    hash = uuid.uuid4()
+    date_str = datetime.now().strftime('%Y-%m-%d')
+    BUCKET_PATH = f'{date_str}-{PROJECT_NAME}-{hash}'
+
+    pipeline_file_path = f'{BUCKET_PATH}.yaml'
 
     kfp.compiler.Compiler().compile(housing_prices_pipeline, pipeline_file_path)
 
@@ -191,4 +188,4 @@ if __name__ == '__main__':
     # precisa entrar e clicar "run"
 
 
-# TODO: colocar algo do .run_after() pra melhorar a ideia 
+# TODO: colocar algo do .run_after() pra melhorar a ideia
