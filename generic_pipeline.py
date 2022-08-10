@@ -161,23 +161,30 @@ def evaluate():
     name='my_generic_pipeline',
     description='testing minio download from within the container'
 )
-def my_pipeline_name():
+def housing_prices_pipeline():
 
-    acquisitor_pipe = acquisitor()
+    acquisitor_step = acquisitor()
 
-    data_prep_pipe = data_prep()
-    data_prep_pipe.after(acquisitor_pipe)
+    data_prep_step = data_prep()
+    data_prep_step.after(acquisitor_step)
 
-    train_model_pipe = train_model()
-    train_model_pipe.after(data_prep_pipe)
+    train_model_step = train_model()
+    train_model_step.after(data_prep_step)
 
-    evaluate_pipe = evaluate()
-    evaluate_pipe.after(train_model_pipe)
+    evaluate_step = evaluate()
+    evaluate_step.after(train_model_step)
 
 
 if __name__ == '__main__':
     global BUCKET_NAME_VAR
 
     BUCKET_NAME_VAR = get_valid_bucket_name()
+    pipeline_file_path = f'{BUCKET_NAME_VAR}.yaml'
 
-    kfp.compiler.Compiler().compile(my_pipeline_name, 'housing-prices_testing_WRAPPER.tar.gz')
+    kfp.compiler.Compiler().compile(housing_prices_pipeline, pipeline_file_path)
+
+    # upload to kfp
+    # precisa do client params
+    client = kfp.Client()
+    pipeline = client.pipeline_uploads.upload_pipeline(pipeline_file_path, name=BUCKET_NAME_VAR)
+    # precisa entrar e clicar "run"
