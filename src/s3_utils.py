@@ -99,7 +99,7 @@ class S3Utils:
                 log('Downloading: ', item)
             client.fget_object(
                 self.bucket_name,
-                object_name=os.path.join(bucket_path, item),  # path in s3
+                object_name=os.path.join(self.bucket_path, item),  # path in s3
                 file_path=item  # local path to download
             )
 
@@ -117,7 +117,7 @@ class S3Utils:
 
             client.fput_object(
                 self.bucket_name,
-                object_name=os.path.join(bucket_path, item),  # path in s3
+                object_name=os.path.join(self.bucket_path, item),  # path in s3
                 file_path=item  # local path to download
             )
 
@@ -202,6 +202,3 @@ if __name__ == '__main__':
 
     elif args.op == 'upload':
         minio.upload(args.items, verbose=args.verbose)
-
-
-# f"python download_utils.py {DOWNLOAD_ENGINE} download {ARQ}"
