@@ -111,6 +111,9 @@ class S3Utils:
             secure=self.secure
         )
 
+        if not client.bucket_exists(self.bucket_name):
+            client.make_bucket(self.bucket_name)
+
         for item in items_list:
             if verbose:
                 log('Uploading: ', item)

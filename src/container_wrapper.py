@@ -30,7 +30,7 @@ class ContainerWrapper:
     S3_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/src/s3_utils.py'
     UTILS_REQUIREMENTS_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/__S3_UTILS_requirements.txt'  # noqa: E501
     UTILS_REQUIREMENTS_NAME = '__S3_UTILS_requirements.txt'
-    SCRIPT_NAME = '__script_for_s3_in_container.py'
+    SCRIPT_NAME = '__SCRIPT_FOR_S3_IN_CONTAINER.py'
 
     COMMAND = '/usr/local/bin/python -m pip install --upgrade pip && '
     COMMAND += f'curl {UTILS_REQUIREMENTS_URL} -o {UTILS_REQUIREMENTS_NAME} && '
