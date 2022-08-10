@@ -166,17 +166,17 @@ def housing_prices_pipeline():
 
 
 if __name__ == '__main__':
-    global BUCKET_NAME_VAR
-    global PROJECT_NAME
-    global BUCKET_PATH
+    # global BUCKET_NAME_VAR
+    # global PROJECT_NAME
+    # global BUCKET_PATH
 
     BUCKET_PATH = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
 
     hash = uuid.uuid4()
     date_str = datetime.now().strftime('%Y-%m-%d')
-    BUCKET_PATH = f'{date_str}-{PROJECT_NAME}-{hash}'
+    BUCKET_PATH = f'{PROJECT_NAME}-{date_str}-{hash}'
 
-    pipeline_file_path = f'{BUCKET_PATH}.yaml'
+    pipeline_file_path = f'{PROJECT_NAME}.yaml'
 
     kfp.compiler.Compiler().compile(housing_prices_pipeline, pipeline_file_path)
 
