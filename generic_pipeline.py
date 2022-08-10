@@ -185,6 +185,7 @@ if __name__ == '__main__':
 
     # upload to kfp
     # precisa do client params
+    # ver: https://kubeflow-pipelines.readthedocs.io/en/stable/source/kfp.client.html#kfp.Client.create_run_from_pipeline_func
     client = kfp.Client()
     pipeline = client.pipeline_uploads.upload_pipeline(pipeline_file_path, name=BUCKET_NAME_VAR)
     # precisa entrar e clicar "run"
