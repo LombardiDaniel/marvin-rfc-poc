@@ -154,9 +154,9 @@ class S3Utils:
 
         return client.bucket_exists(bucket_name)
 
-    @staticmethod
-    def get_valid_uuid():
+    def get_valid_uuid(self):
         '''
+        # TODO: colocar a lib uuid python
         '''
 
         client = Minio(
@@ -166,8 +166,20 @@ class S3Utils:
             secure=self.secure
         )
 
-        for item in client.list_objects(self.bucket_name, recursive=True):
-            pass
+        list_of_dirs = []
+        for item in client.list_objects(self.bucket_name, recursive=False):
+            if item.object_name[-1] == '/':
+                list_of_dirs.append(item.object_name[:-1])
+
+        hash = secrets.token_hex(int(HASH_SIZE / 2))
+        bucket_path_tmp = f"{self.bucket_path}_{hash}"
+
+        while bucket_path_tmp in list_of_dirs:
+            hash = secrets.token_hex(int(HASH_SIZE / 2))
+            bucket_path_tmp = f"{self.bucket_path}_{hash}"
+
+        self.bucket_path = bucket_path_tmp
+        return hash
 
 
 if __name__ == '__main__':
