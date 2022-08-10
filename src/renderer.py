@@ -46,6 +46,12 @@ class Renderer:
 
     def calculate_uploads(self):
         '''
+
+        =>> fileDependencies na vdd ta falando da:
+            sua_maquina -> cloudStorage
+            NAO:
+                container -> cloudStorage
+
         Calculates files needed to upload to storage before pipeline run.
         '''
 
@@ -57,3 +63,4 @@ class Renderer:
             outputs += step['fileOutputs']
 
         return [item for item in inputs if item not in outputs]
+        # list( dict.fromkeys(mylist) )

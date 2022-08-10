@@ -49,6 +49,7 @@ trainingprep_other_months:
         #   components are already available
         - "*.csv"
         - "data_imports.txt"
+        - "/usr/notebooks/trainingprep_other_months.ipynb"
     fileOutputs:
         - "formated.csv"
 

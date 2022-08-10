@@ -69,10 +69,10 @@ def setup_storage_pipeline_dependencies(files=[]):
 
 # - USER DEFINED PIPELINE - #
 
-# Uploads dependencies
+# Uploads dependencies -> colocar isso aqui na main
 setup_minio_pipeline_dependencies(
     {% for file in pipeline.file_dependencies %}
-        {{ file }},
+    {{ file }},
     {% endfor %}
 )
 

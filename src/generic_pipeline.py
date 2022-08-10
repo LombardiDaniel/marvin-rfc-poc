@@ -189,3 +189,6 @@ if __name__ == '__main__':
     client = kfp.Client()
     pipeline = client.pipeline_uploads.upload_pipeline(pipeline_file_path, name=BUCKET_NAME_VAR)
     # precisa entrar e clicar "run"
+
+
+# TODO: colocar algo do .run_after() pra melhorar a ideia 

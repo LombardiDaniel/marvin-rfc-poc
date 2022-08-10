@@ -13,6 +13,9 @@ defaultParams:
     envFile: .global.env
     runInterval: 0 0 * * 1 # crontab -> toda segunda
 
+# uploadToCloudStorage:
+#     - "https://github.com/LombardiDaniel/marvin-rfc-poc/blob/main/README.md"
+
 components:
     - ./steps.yaml
     - ./other/predict.yaml
@@ -22,6 +25,9 @@ components:
 
 pipelineExecutionOrder:
     - acquisitor: # no config specified, so will run with only imported parameters
+        envVars:
+            NAME: "outro"
+        notebookPath: /usr/colab_projs/acquisitor.ipynb
 
     - decision: # `decision` eh apenas o nome, pode ser oq quiser
     # all items under the key `decision` are run assync
@@ -52,13 +58,13 @@ pipelineExecutionOrder:
                 DB_ENDPOINT_URL: http://chronograf
                 DB_KEY: 123456789
 
-        - training:
-            fromFile: ./other/predict.yaml # optional, on pipeline file only, indica de onde vem
-                # o componente, caso esteja presente nos 2 arquivos
+    - training:
+        fromFile: ./other/predict.yaml # optional, on pipeline file only, indica de onde vem
+            # o componente, caso esteja presente nos 2 arquivos
 
-        - prediction_preparator:
+    - prediction_preparator:
 
-        - predictor:
+    - predictor:
 
 
 # fica bem a vontade do usuario, se quiser nem usar um arquivo de components,
