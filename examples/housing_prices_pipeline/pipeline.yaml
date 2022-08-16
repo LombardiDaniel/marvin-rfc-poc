@@ -1,74 +1,73 @@
-pipelineName: pipelineOuvidoria
+pipelineName: pipeline_housing_prices
 
 defaultParams:
-    storageBucket: http://minioip
-    image: dockerImageName # do repositorio hub.docker
+    storageBucket: housing_prices
+    setupCommand: "pip install -r requirements.txt"
     envVars:
-        # achar os nomes corretos
-        MLFLOW_TRACKING_URI: http://mlflow.io
-        MLFLOW_ACCESS_KEY: secretKey
-        MLFLOW_S3_ENDPOINT_URL: http://minio.io
-        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-        AWS_SECRET_ACCESS_KEY: secretKey
+        - MINIO_ACCESS_KEY: minio_key
+        - MINIO_SECRET_KEY: minio_secret
+        - MINIO_ENDPOINT: minio_uri
     envFile: .global.env
-    runInterval: 0 0 * * 1 # crontab -> toda segunda
+    dependencies:
+        - requirements.txt
+        - test.csv
+        - train.csv
+        - acquisitor.py
+        - data_prep.py
+        - train_model.py
+        - evaluate.py
 
-# uploadToCloudStorage:
-#     - "https://github.com/LombardiDaniel/marvin-rfc-poc/blob/main/README.md"
+pipeline:
+    - stepName: acquisitor
+      description: Acquisitor
+      entrypoint: acquisitor.py
+      command: "python acquisitor.py"
+      inputs:
+        - test.csv
+        - train.csv
 
-components:
-    - ./steps.yaml
-    - ./other/predict.yaml
-    # - additional_steps.yaml
-    # nao precisa usar a tag components, podem ser descritos totalmente
-    #   no arquivo de pipeline
+    - stepName: data_prep
+      description: Data preparator
+      runAfter: 
+        - acquisitor
+      entrypoint: data_prep.py
+      command: "python data_prep.py"
+      inputs:
+        - test.csv
+        - train.csv
+      outputs:
+        - X_train.csv
+        - y_train.csv
+        - X_test.csv
+        - y_test.csv
 
-pipelineExecutionOrder:
-    - acquisitor: # no config specified, so will run with only imported parameters
-        envVars:
-            - NAME: "outro"
-        notebookPath: /usr/colab_projs/acquisitor.ipynb
+    - stepName: train_model
+      description: Train the machine learning model
+      runAfter: 
+        - data_prep
+      entrypoint: train_model.py
+      command: "python train_model.py"
+      inputs:
+        - X_train.csv
+        - y_train.csv
+        - X_test.csv
+        - y_test.csv
+      outputs:
+        - regressionTree
+        - regressionLinear
+        - randomForest
 
-    - decision: # `decision` eh apenas o nome, pode ser oq quiser
-    # all items under the key `decision` are run assync
-        - trainingprep_november:
-            # itens como `conditionForActivation` podem estar tanto no arquivo de
-            #  components como no arquivo do pipeline.
-            #       config_utilizada = (config_components_file U config_pipeline_file)
-            conditionForActivation: |
-                # This scope has access to all variables defined in previous pipeline step.
-                # Must return a bool.
-
-                from datetime import datetime
-                if datetime.now().month == 10:
-                    return True
-
-                return False
-
-            fileOutputs:
-                - "formated.csv"
-
-        - trainingprep_other_months:
-            # - conditionForActivation: "return !isNovember"
-            fileOutputs:
-                - "formated.csv"
-
-        - trainingprep_logger:
-            envVars:
-                DB_ENDPOINT_URL: http://chronograf
-                DB_KEY: 123456789
-
-    - training:
-        fromFile: ./other/predict.yaml # optional, on pipeline file only, indica de onde vem
-            # o componente, caso esteja presente nos 2 arquivos
-
-    - prediction_preparator:
-
-    - predictor:
-
-
-# fica bem a vontade do usuario, se quiser nem usar um arquivo de components,
-# nem precisa, pode declarar tudo aqui (bem generico).
-#       >> Facilita ate a programacao, a gnt "junta" os arquivos de pipeline
-#           componentes e cria um unico arquivo "final" de pipeline, a partir
-#           dele que geramos os codigos para o kfp
+    - stepName: evaluate
+      description: Evaluates the metrics
+      runAfter: 
+        - train_model
+      entrypoint: evaluate.py
+      command: "python evaluate.py"
+      inputs:
+        - X_train.csv
+        - y_train.csv
+        - X_test.csv
+        - y_test.csv
+        - regressionTree
+        - regressionLinear
+        - randomForest
