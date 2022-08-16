@@ -19,9 +19,8 @@ defaultParams:
 pipeline:
     - stepName: acquisitor
       description: Acquisitor
-      entrypoint: acquisitor.py
-      command: "python acquisitor.py"
-      inputs:
+      entrypoint: python acquisitor.py
+      fileInputs:
         - test.csv
         - train.csv
 
@@ -29,12 +28,11 @@ pipeline:
       description: Data preparator
       runAfter:
         - acquisitor
-      entrypoint: data_prep.py
-      command: "python data_prep.py"
-      inputs:
+      entrypoint: python data_prep.py
+      fileInputs:
         - test.csv
         - train.csv
-      outputs:
+      fileOutputs:
         - X_train.csv
         - y_train.csv
         - X_test.csv
@@ -44,13 +42,13 @@ pipeline:
       description: Train the machine learning model
       runAfter:
         - data_prep
-      entrypoint: "python train_model.py"
-      inputs:
+      entrypoint: python train_model.py
+      fileInputs:
         - X_train.csv
         - y_train.csv
         - X_test.csv
         - y_test.csv
-      outputs:
+      fileOutputs:
         - regressionTree
         - regressionLinear
         - randomForest
@@ -59,9 +57,8 @@ pipeline:
       description: Evaluates the metrics
       runAfter:
         - train_model
-      entrypoint: evaluate.py
-      command: "python evaluate.py"
-      inputs:
+      entrypoint: python evaluate.py
+      fileInputs:
         - X_train.csv
         - y_train.csv
         - X_test.csv
