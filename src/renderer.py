@@ -23,6 +23,8 @@ class Renderer:
     def _parse_yaml(complete_yaml):
         '''
         Fixes the "keys should not contain data" problem.
+
+        # TODO: now only works for envVars (inside steps, not global), gotta work on that.
         '''
 
         for step, i in enumerate(complete_yaml['pipelineExecutionOrder']):
@@ -64,3 +66,31 @@ class Renderer:
 
         return [item for item in inputs if item not in outputs]
         # list( dict.fromkeys(mylist) )
+
+
+
+
+# pipelineExecutionOrder = [
+#     {
+#         'acquisitor': {
+#             'envVars': [
+#                 {'NAME': 'outro'},
+#             ],
+#             'notebookPath': '/usr/colab_projs/acquisitor.ipynb',
+#         },
+#     }
+# ]
+#
+# pipelineExecutionOrder = [
+#     {
+#         'stepName': 'acquisitor',
+#         'stepComponents': {
+#             'envVars':[
+#                 {
+#                     'key': 'NAME',
+#                     'value': 'outro',
+#                 }
+#             ]
+#         }
+#     }
+# ]

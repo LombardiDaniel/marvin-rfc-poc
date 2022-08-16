@@ -1,0 +1,74 @@
+pipelineName: pipelineOuvidoria
+
+defaultParams:
+    storageBucket: http://minioip
+    image: dockerImageName # do repositorio hub.docker
+    envVars:
+        # achar os nomes corretos
+        MLFLOW_TRACKING_URI: http://mlflow.io
+        MLFLOW_ACCESS_KEY: secretKey
+        MLFLOW_S3_ENDPOINT_URL: http://minio.io
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: secretKey
+    envFile: .global.env
+    runInterval: 0 0 * * 1 # crontab -> toda segunda
+
+# uploadToCloudStorage:
+#     - "https://github.com/LombardiDaniel/marvin-rfc-poc/blob/main/README.md"
+
+components:
+    - ./steps.yaml
+    - ./other/predict.yaml
+    # - additional_steps.yaml
+    # nao precisa usar a tag components, podem ser descritos totalmente
+    #   no arquivo de pipeline
+
+pipelineExecutionOrder:
+    - acquisitor: # no config specified, so will run with only imported parameters
+        envVars:
+            - NAME: "outro"
+        notebookPath: /usr/colab_projs/acquisitor.ipynb
+
+    - decision: # `decision` eh apenas o nome, pode ser oq quiser
+    # all items under the key `decision` are run assync
+        - trainingprep_november:
+            # itens como `conditionForActivation` podem estar tanto no arquivo de
+            #  components como no arquivo do pipeline.
+            #       config_utilizada = (config_components_file U config_pipeline_file)
+            conditionForActivation: |
+                # This scope has access to all variables defined in previous pipeline step.
+                # Must return a bool.
+
+                from datetime import datetime
+                if datetime.now().month == 10:
+                    return True
+
+                return False
+
+            fileOutputs:
+                - "formated.csv"
+
+        - trainingprep_other_months:
+            # - conditionForActivation: "return !isNovember"
+            fileOutputs:
+                - "formated.csv"
+
+        - trainingprep_logger:
+            envVars:
+                DB_ENDPOINT_URL: http://chronograf
+                DB_KEY: 123456789
+
+    - training:
+        fromFile: ./other/predict.yaml # optional, on pipeline file only, indica de onde vem
+            # o componente, caso esteja presente nos 2 arquivos
+
+    - prediction_preparator:
+
+    - predictor:
+
+
+# fica bem a vontade do usuario, se quiser nem usar um arquivo de components,
+# nem precisa, pode declarar tudo aqui (bem generico).
+#       >> Facilita ate a programacao, a gnt "junta" os arquivos de pipeline
+#           componentes e cria um unico arquivo "final" de pipeline, a partir
+#           dele que geramos os codigos para o kfp
