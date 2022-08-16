@@ -8,9 +8,9 @@ defaultParams:
         MLFLOW_TRACKING_URI: http://mlflow.io
         MLFLOW_ACCESS_KEY: secretKey
         MLFLOW_S3_ENDPOINT_URL: http://minio.io
-        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID_FROM_GLOBAL_ENV_FILE}
         AWS_SECRET_ACCESS_KEY: secretKey
-    envFile: .global.env
+    envFile: .global.env  # esse envFile é lido no momento de parsing, utiliza pra substituir env vars como AWS_ACCESS_KEY_ID (linha 11)
     runInterval: 0 0 * * 1 # crontab -> toda segunda
 
 # uploadToCloudStorage:
@@ -27,7 +27,7 @@ pipelineExecutionOrder:
     - acquisitor: # no config specified, so will run with only imported parameters
         envVars:
             - NAME: "outro"
-        notebookPath: /usr/colab_projs/acquisitor.ipynb
+        notebookPath: acquisitor.py
 
     - decision: # `decision` eh apenas o nome, pode ser oq quiser
     # all items under the key `decision` are run assync

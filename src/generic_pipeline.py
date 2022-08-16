@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
     BUCKET_PATH = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
 
-    hash = uuid.uuid4()
+    hash = uuid.uuid4()  # o proprio marvin passa o hash pro arquivo final -> template recebe o hash
     date_str = datetime.now().strftime('%Y-%m-%d')
     BUCKET_PATH = f'{PROJECT_NAME}-{date_str}-{hash}'
 

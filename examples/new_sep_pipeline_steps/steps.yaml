@@ -32,7 +32,7 @@ trainingprep_november:
     fileDependencies:
         # By default, all previous outputs from past
         #   components are already available
-        - "*.csv"
+        - "*.csv"  # '*' (wildcard dependencies) are NOT supported
         - "data_imports.txt"
     fileOutputs:
         - "formated.csv"
@@ -44,6 +44,7 @@ trainingprep_other_months:
     # envVars:
     #     DATE_BEGIN: 10/10/2021
     #     DATE_END: 10/10/2022
+    entrypoint: "python my_python_script.py myArg1"
     fileDependencies:
         # By default, all previous outputs from past
         #   components are already available

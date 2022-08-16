@@ -1,6 +1,8 @@
 '''
 '''
 
+import uuid4
+
 import jinja2
 
 from s3_utils import S3Utils
@@ -18,6 +20,24 @@ class Renderer:
     #
     def __init__(self, complete_yaml):
         self.parsed_yaml = Renderer._parse_yaml(complete_yaml)
+        self.parsed_yaml['uuid'] = uuid.uuid4()
+
+    def render(self, target_path=None):
+        '''
+        '''
+
+        env = jinja2.Environment(
+            loader=jinja2.PackageLoader('src'),
+            autoescape=jinja2.select_autoescape()
+        )
+
+        pipeline_template = env.get_template('pipeline.py.j2')
+        rendererd_pipeline = pipeline_template.render(
+            pipeline=self.parsed_yaml
+        )
+
+
+
 
     @staticmethod
     def _parse_yaml(complete_yaml):

@@ -22,13 +22,13 @@ class ContainerWrapper:
 
     Methods:
         - run(script_to_wrap) : Generates the ContainerOp instance with all needed env vars (
-            BUG FIX: Any env var that is capable of being converted to floar/int will be exported using
-            bash export command.
+            BUG FIX: Any env var that is capable of being converted to floar/int will be exported
+            using bash export command.
         ) and the user script
     '''
 
-    S3_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/src/s3_utils.py'
-    UTILS_REQUIREMENTS_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/__S3_UTILS_requirements.txt'  # noqa: E501
+    S3_SCRIPT_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/src/s3_utils.py'  # noqa: E501 # pylint: disable=C0301
+    UTILS_REQUIREMENTS_URL = 'https://raw.githubusercontent.com/LombardiDaniel/marvin-rfc-poc/main/__S3_UTILS_requirements.txt'  # noqa: E501 # pylint: disable=C0301
     UTILS_REQUIREMENTS_NAME = '__S3_UTILS_requirements.txt'
     SCRIPT_NAME = '__SCRIPT_FOR_S3_IN_CONTAINER.py'
 

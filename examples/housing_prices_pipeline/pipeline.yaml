@@ -4,10 +4,9 @@ defaultParams:
     storageBucket: housing_prices
     setupCommand: "pip install -r requirements.txt"
     envVars:
-        - MINIO_ACCESS_KEY: minio_key
-        - MINIO_SECRET_KEY: minio_secret
-        - MINIO_ENDPOINT: minio_uri
-    envFile: .global.env
+        - S3_ACCESS_KEY: minio_key
+        - S3_SECRET_KEY: minio_secret
+        - S3_ENDPOINT: minio_uri
     dependencies:
         - requirements.txt
         - test.csv
@@ -28,7 +27,7 @@ pipeline:
 
     - stepName: data_prep
       description: Data preparator
-      runAfter: 
+      runAfter:
         - acquisitor
       entrypoint: data_prep.py
       command: "python data_prep.py"
@@ -43,10 +42,9 @@ pipeline:
 
     - stepName: train_model
       description: Train the machine learning model
-      runAfter: 
+      runAfter:
         - data_prep
-      entrypoint: train_model.py
-      command: "python train_model.py"
+      entrypoint: "python train_model.py"
       inputs:
         - X_train.csv
         - y_train.csv
@@ -59,7 +57,7 @@ pipeline:
 
     - stepName: evaluate
       description: Evaluates the metrics
-      runAfter: 
+      runAfter:
         - train_model
       entrypoint: evaluate.py
       command: "python evaluate.py"
