@@ -20,6 +20,8 @@ pipeline:
     - stepName: acquisitor
       description: Acquisitor
       entrypoint: python acquisitor.py
+      ennVars:
+        - MY_ENV_VAR: "test_specific_env"
       fileInputs:
         - test.csv
         - train.csv
