@@ -69,6 +69,9 @@ def {{ step.name }}_step_func():
     {% for file in step.fileInputs %}
         '{{ file }}',
     {% endfor %}
+    {% for file in pipeline.defaultParams.dependencies %}
+        '{{ file }}',
+    {% endfor %}
     ]
 
     container.file_outputs = [
