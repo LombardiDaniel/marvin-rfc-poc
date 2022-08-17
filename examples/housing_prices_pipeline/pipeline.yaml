@@ -1,4 +1,5 @@
 pipelineName: pipeline_housing_prices
+description: Pipeline for presentation of famous housing_prices problem
 
 defaultParams:
     storageBucket: housing_prices
@@ -16,8 +17,8 @@ defaultParams:
         - train_model.py
         - evaluate.py
 
-pipeline:
-    - stepName: acquisitor
+pipelineSteps:
+    - name: acquisitor
       description: Acquisitor
       entrypoint: python acquisitor.py
       ennVars:
@@ -26,7 +27,7 @@ pipeline:
         - test.csv
         - train.csv
 
-    - stepName: data_prep
+    - name: data_prep
       description: Data preparator
       runAfter:
         - acquisitor
@@ -40,7 +41,7 @@ pipeline:
         - X_test.csv
         - y_test.csv
 
-    - stepName: train_model
+    - name: train_model
       description: Train the machine learning model
       runAfter:
         - data_prep
@@ -55,7 +56,7 @@ pipeline:
         - regressionLinear
         - randomForest
 
-    - stepName: evaluate
+    - name: evaluate
       description: Evaluates the metrics
       runAfter:
         - train_model
