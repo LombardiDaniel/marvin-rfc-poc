@@ -2,7 +2,7 @@ pipelineName: pipeline_housing_prices
 
 defaultParams:
     storageBucket: housing_prices
-    setupCommand: "pip install -r requirements.txt"
+    setupCommand: pip install -r requirements.txt
     envVars:
         - S3_ACCESS_KEY: minio_key
         - S3_SECRET_KEY: minio_secret
@@ -21,7 +21,7 @@ pipeline:
       description: Acquisitor
       entrypoint: python acquisitor.py
       ennVars:
-        - MY_ENV_VAR: "test_specific_env"
+        - MY_ENV_VAR: test_specific_env
       fileInputs:
         - test.csv
         - train.csv
