@@ -1,7 +1,9 @@
 '''
 '''
-
+import json
 import uuid
+
+import json
 
 import jinja2
 
@@ -18,22 +20,33 @@ class Renderer:
     #         # mais um for k, v aqui dnetro
     #         pipeline[k] = v
     #
-    def __init__(self, complete_yaml):
-        self.parsed_yaml = Renderer._parse_yaml(complete_yaml)
+    def __init__(self, parsed_yaml):
+        self.parsed_yaml = parsed_yaml
+        self.parsed_yaml['envVars'] = {}
+
+        # for env_var in parsed_yaml['envVars']:  # special case for global env vars, key contains information
+        #     self.parsed_yaml['envVars'][k] = v
+
         self.parsed_yaml['uuid'] = uuid.uuid4()
 
-    def render(self, target_path=None):
+    def render(self, target_path=None, upload=False):
         '''
         '''
 
-        env = jinja2.Environment(
-            loader=jinja2.PackageLoader('src'),
-            autoescape=jinja2.select_autoescape()
-        )
+        # env = jinja2.Environment(
+        #     loader=jinja2.PackageLoader('templates'),
+        #     autoescape=jinja2.select_autoescape()
+        # )
+        #
+        # pipeline_template = env.get_template('pipeline.py.j2')
+        template_file = ''
+        with open('templates/pipeline.py.j2', 'r', encoding='UTF-8') as file:
+            template_file = file.read()
 
-        pipeline_template = env.get_template('pipeline.py.j2')
+        pipeline_template = jinja2.Template(template_file)
         rendered_pipeline = pipeline_template.render(
-            pipeline=self.parsed_yaml
+            pipeline=self.parsed_yaml,
+            upload=upload
         )
 
         with open(target_path, 'w', encoding='UTF-8') as file:
@@ -41,78 +54,11 @@ class Renderer:
 
         return rendered_pipeline
 
-    @staticmethod
-    def _parse_yaml(complete_yaml):
-        '''
-        Fixes the "keys should not contain data" problem.
 
-        # TODO: now only works for envVars (inside steps, not global), gotta work on that.
-        '''
+d = {}
+with open('/Users/daniellombardi/Desktop/UFSCar/MARVIN.nosync/marvin-rfc-poc/examples/housing_prices_pipeline/pipeline.json', 'r') as f:
+    d = json.load(f)
 
-        for step, i in enumerate(complete_yaml['pipelineExecutionOrder']):
-            # in here, all items will be either a dictionary (linear) or a list (parallel)
-            if isinstance(step, dict):
-                for k, v in step.items():  # step will only have one key
-                    complete_yaml['pipelineExecutionOrder'][i] = {
-                        'name': k,
-                        'metadata': v
-                    }
+r = Renderer(d)
 
-            elif isinstance(step, list):
-                for parallel_step, j in enumerate(step):
-                    for k, v in parallel_step.items():
-                        complete_yaml['pipelineExecutionOrder'][i][j] = {
-                            'name': k,
-                            'metadata': v
-                        }
-
-        return complete_yaml
-
-    def calculate_uploads(self):
-        '''
-
-        =>> fileDependencies na vdd ta falando da:
-            sua_maquina -> cloudStorage
-            NAO:
-                container -> cloudStorage
-
-        Calculates files needed to upload to storage before pipeline run.
-        '''
-
-        inputs = []
-        outputs = []
-
-        for step in self.parsed_yaml['pipelineExecutionOrder']:
-            inputs += step['fileInputs']
-            outputs += step['fileOutputs']
-
-        return [item for item in inputs if item not in outputs]
-        # list( dict.fromkeys(mylist) )
-
-
-
-
-# pipelineExecutionOrder = [
-#     {
-#         'acquisitor': {
-#             'envVars': [
-#                 {'NAME': 'outro'},
-#             ],
-#             'notebookPath': '/usr/colab_projs/acquisitor.ipynb',
-#         },
-#     }
-# ]
-#
-# pipelineExecutionOrder = [
-#     {
-#         'stepName': 'acquisitor',
-#         'stepComponents': {
-#             'envVars':[
-#                 {
-#                     'key': 'NAME',
-#                     'value': 'outro',
-#                 }
-#             ]
-#         }
-#     }
-# ]
+r.render('test_renderer.py')
