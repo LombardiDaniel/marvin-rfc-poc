@@ -1,0 +1,101 @@
+{
+  "pipelineName": "pipeline_housing_prices",
+  "defaultParams": {
+    "storageBucket": "housing_prices",
+    "setupCommand": "pip install -r requirements.txt",
+    "envVars": [
+      {
+        "key": "S3_ACCESS_KEY",
+        "value": "minio_key"
+      },
+      {
+        "key": "S3_SECRET_KEY",
+        "value": "minio_secret"
+      },
+      {
+        "key": "S3_ENDPOINT",
+        "value": "minio_uri"
+      }
+    ],
+    "dependencies": [
+      "requirements.txt",
+      "test.csv",
+      "train.csv",
+      "acquisitor.py",
+      "data_prep.py",
+      "train_model.py",
+      "evaluate.py"
+    ]
+  },
+  "pipeline": [
+    {
+      "stepName": "acquisitor",
+      "description": "Acquisitor",
+      "entrypoint": "python acquisitor.py",
+      "envVars": [
+        {
+          "key": "MY_ENV_VAR",
+          "value": "test_specific_env"
+        }
+      ],
+      "fileInputs": [
+        "test.csv",
+        "train.csv"
+      ]
+    },
+    {
+      "stepName": "data_prep",
+      "description": "Data preparator",
+      "runAfter": [
+        "acquisitor"
+      ],
+      "entrypoint": "python data_prep.py",
+      "fileInputs": [
+        "test.csv",
+        "train.csv"
+      ],
+      "fileOutputs": [
+        "X_train.csv",
+        "y_train.csv",
+        "X_test.csv",
+        "y_test.csv"
+      ]
+    },
+    {
+      "stepName": "train_model",
+      "description": "Train the machine learning model",
+      "runAfter": [
+        "data_prep"
+      ],
+      "entrypoint": "python train_model.py",
+      "fileInputs": [
+        "X_train.csv",
+        "y_train.csv",
+        "X_test.csv",
+        "y_test.csv"
+      ],
+      "fileOutputs": [
+        "regressionTree",
+        "regressionLinear",
+        "randomForest"
+      ]
+    },
+    {
+      "stepName": "evaluate",
+      "description": "Evaluates the metrics",
+      "runAfter": [
+        "train_model"
+      ],
+      "entrypoint": "python evaluate.py",
+      "fileInputs": [
+        "X_train.csv",
+        "y_train.csv",
+        "X_test.csv",
+        "y_test.csv",
+        "regressionTree",
+        "regressionLinear",
+        "randomForest"
+      ]
+    }
+  ]
+}
