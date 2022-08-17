@@ -107,13 +107,6 @@ if __name__ == '__main__':
     global BUCKET_NAME_VAR
 
     # TODO: colocar algum tipo de if aqui, q usa sys.args, e a gnt passa na hr de compilar, se entrar no if, sobe os arquivos e o pipe, cria a run e bora
-    setup_storage_pipeline_dependencies(
-        [   # na vdd vai terq mudar: é pra invocar isso aqui só quando marndar rodar, nao qnd compilar
-            {% for file in pipeline.params. %}  # TODO: colocar nome dos arquivos pra upload pro minio antes de rodar compilar o pipe
-            '{{file}}',
-            {% endfor %}
-        ]
-    )
 
     PROJECT_NAME = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
 
@@ -124,6 +117,16 @@ if __name__ == '__main__':
     BUCKET_PATH = f'{PROJECT_NAME}-{date_str}-{hash}'
 
     pipeline_file_path = f'{PROJECT_NAME}.yaml'
+
+    {% if upload %}
+    setup_storage_pipeline_dependencies(
+        [
+            {% for file in pipeline.params.dependencies %}
+            '{{file}}',
+            {% endfor %}
+        ]
+    )
+    {% endif %}
 
     kfp.compiler.Compiler().compile({{ pipeline.pipelineName }}_func, pipeline_file_path)
 
