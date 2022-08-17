@@ -80,7 +80,7 @@ class S3Utils:
             self.bucket_name = bucket_name
         else:
             raise BaseException(
-                'Invalid bucket name. Please check: https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html'  # noqa: E501
+                f'Invalid bucket name ("{bucket_name}"). Please check: https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html'  # noqa: E501
             )
 
         self.bucket_path = bucket_path

@@ -2,7 +2,7 @@
 Jinja template for pipeline creation.
 '''
 
-from datetime import date
+from datetime import datetime
 
 import kfp
 from kfp import dsl
@@ -37,27 +37,21 @@ def create_container(**kwargs):
 
 def setup_storage_pipeline_dependencies(files=[]):
     '''
-    Manually sets up the minio objects for the first container.
+    Manually sets up the s3 objects for the first container.
     '''
 
-    minio = S3Utils(
-        MINIO_ENDPOINT_VAR,
-        MINIO_ACCESS_KEY_VAR,
-        MINIO_SECRET_KEY_VAR,
-        BUCKET_NAME_VAR,
+    s3 = S3Utils(
+        S3ENDPOINT_VAR,
+        S3ACCESS_KEY_VAR,
+        S3SECRET_KEY_VAR,
+        bucket_name=BUCKET_NAME_VAR,
+        bucket_path=BUCKET_PATH
     )
 
-    minio.upload(files)
+    s3.upload(files)
 
 
 # - ***USER DEFINED PIPELINE*** - #
-
-# Uploads dependencies -> colocar isso aqui na main
-setup_minio_pipeline_dependencies(
-    {% for file in pipeline.defaultParams.dependencies %}
-    '{{ file }}',
-    {% endfor %}
-)
 
 # Generate funcions
 {% for step in pipeline.pipelineSteps %}
@@ -91,10 +85,10 @@ def {{ step.name }}():
 )
 def {{ pipeline.pipelineName }}_func():
 
-    {% for step in pipeline.steps %}
+    {% for step in pipeline.pipelineSteps %}
     {{ step.name }}_step = {{ step.name }}()
         {% if loop.index > 0 %}
-            {% if step.runAfter is not none %}
+            {% if step.runAfter %}
     {{ step.name }}_step.after({{ step.runAfter }}_step)
             {% endif %}
         {% endif %}
@@ -104,7 +98,8 @@ def {{ pipeline.pipelineName }}_func():
 # falta montar a main certa
 if __name__ == '__main__':
     # TODO: colocar algum tipo de if aqui, q usa sys.args, e a gnt passa na hr de compilar, se entrar no if, sobe os arquivos e o pipe, cria a run e bora
-
+    global BUCKET_PATH
+    
     PROJECT_NAME = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
 
     # hash = uuid.uuid4()  # o proprio marvin passa o hash pro arquivo final -> template recebe o hash
@@ -118,7 +113,7 @@ if __name__ == '__main__':
     {% if upload %}
     setup_storage_pipeline_dependencies(
         [
-            {% for file in pipeline.params.dependencies %}
+            {% for file in pipeline.defaultParams.dependencies %}
             '{{file}}',
             {% endfor %}
         ]

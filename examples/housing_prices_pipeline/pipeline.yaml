@@ -29,8 +29,7 @@ pipelineSteps:
 
     - name: data_prep
       description: Data preparator
-      runAfter:
-        - acquisitor
+      runAfter: acquisitor
       entrypoint: python data_prep.py
       fileInputs:
         - test.csv
@@ -43,8 +42,7 @@ pipelineSteps:
 
     - name: train_model
       description: Train the machine learning model
-      runAfter:
-        - data_prep
+      runAfter: data_prep
       entrypoint: python train_model.py
       fileInputs:
         - X_train.csv
@@ -58,8 +56,7 @@ pipelineSteps:
 
     - name: evaluate
       description: Evaluates the metrics
-      runAfter:
-        - train_model
+      runAfter: train_model
       entrypoint: python evaluate.py
       fileInputs:
         - X_train.csv
