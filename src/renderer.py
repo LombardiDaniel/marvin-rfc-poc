@@ -22,11 +22,6 @@ class Renderer:
     #
     def __init__(self, parsed_yaml):
         self.parsed_yaml = parsed_yaml
-        self.parsed_yaml['envVars'] = {}
-
-        # for env_var in parsed_yaml['envVars']:  # special case for global env vars, key contains information
-        #     self.parsed_yaml['envVars'][k] = v
-
         self.parsed_yaml['uuid'] = uuid.uuid4()
 
     def render(self, target_path=None, upload=False):
@@ -56,7 +51,7 @@ class Renderer:
 
 
 d = {}
-with open('/Users/daniellombardi/Desktop/UFSCar/MARVIN.nosync/marvin-rfc-poc/examples/housing_prices_pipeline/pipeline.json', 'r') as f:
+with open('../examples/housing_prices_pipeline/pipeline.json', 'r') as f:
     d = json.load(f)
 
 r = Renderer(d)
