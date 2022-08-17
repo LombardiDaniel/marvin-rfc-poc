@@ -41,9 +41,9 @@ def setup_storage_pipeline_dependencies(files=[]):
     '''
 
     s3 = S3Utils(
-        S3ENDPOINT_VAR,
-        S3ACCESS_KEY_VAR,
-        S3SECRET_KEY_VAR,
+        S3_ENDPOINT_VAR,
+        S3_ACCESS_KEY_VAR,
+        S3_SECRET_KEY_VAR,
         bucket_name=BUCKET_NAME_VAR,
         bucket_path=BUCKET_PATH
     )
@@ -99,7 +99,7 @@ def {{ pipeline.pipelineName }}_func():
 if __name__ == '__main__':
     # TODO: colocar algum tipo de if aqui, q usa sys.args, e a gnt passa na hr de compilar, se entrar no if, sobe os arquivos e o pipe, cria a run e bora
     global BUCKET_PATH
-    
+
     PROJECT_NAME = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
 
     # hash = uuid.uuid4()  # o proprio marvin passa o hash pro arquivo final -> template recebe o hash
