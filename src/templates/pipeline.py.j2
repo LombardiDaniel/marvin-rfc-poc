@@ -18,6 +18,7 @@ S3_ENDPOINT_VAR = '{{ pipeline.defaultParams.envVars.S3_ENDPOINT }}'
 S3_ACCESS_KEY_VAR = '{{ pipeline.defaultParams.envVars.S3_ACCESS_KEY }}'
 S3_SECRET_KEY_VAR = '{{ pipeline.defaultParams.envVars.S3_SECRET_KEY }}'
 BUCKET_NAME_VAR = S3Utils.replace_invalid_bucket_name_chars('{{ pipeline.defaultParams.storageBucket }}')
+BUCKET_PATH = ''
 
 def create_container(**kwargs):
     '''
@@ -31,6 +32,7 @@ def create_container(**kwargs):
         S3_ACCESS_KEY=S3_ACCESS_KEY_VAR,
         S3_SECRET_KEY=S3_SECRET_KEY_VAR,
         BUCKET_NAME=BUCKET_NAME_VAR,
+        BUCKET_PATH=BUCKET_PATH,
         **kwargs
     )
 
@@ -55,13 +57,13 @@ def setup_storage_pipeline_dependencies(files=[]):
 
 # Generate funcions
 {% for step in pipeline.pipelineSteps %}
-def {{ step.name }}():
+def {{ step.name }}_step_func():
     container = create_container(
     {% for env_var in step.envVars %}
         {{ env_var.key }}='{{ env_var.value }}',
     {% endfor %}
     )
-    container.name = {{ step.name }}
+    container.name = '{{ step.name }}'
 
     container.file_inputs = [
     {% for file in step.fileInputs %}
@@ -86,7 +88,7 @@ def {{ step.name }}():
 def {{ pipeline.pipelineName }}_func():
 
     {% for step in pipeline.pipelineSteps %}
-    {{ step.name }}_step = {{ step.name }}()
+    {{ step.name }}_step = {{ step.name }}_step_func()
         {% if loop.index > 0 %}
             {% if step.runAfter %}
     {{ step.name }}_step.after({{ step.runAfter }}_step)
@@ -98,7 +100,6 @@ def {{ pipeline.pipelineName }}_func():
 # falta montar a main certa
 if __name__ == '__main__':
     # TODO: colocar algum tipo de if aqui, q usa sys.args, e a gnt passa na hr de compilar, se entrar no if, sobe os arquivos e o pipe, cria a run e bora
-    global BUCKET_PATH
 
     PROJECT_NAME = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
 
