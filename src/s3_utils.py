@@ -95,11 +95,12 @@ class S3Utils:
 
         # for item in client.list_objects(self.bucket_name, recursive=True):
         for item in items_list:
+            item_path = os.path.join(self.bucket_path, item)
             if verbose:
-                log('Downloading: ', item)
+                log('Downloading: ', item_path)
             client.fget_object(
                 self.bucket_name,
-                object_name=os.path.join(self.bucket_path, item),  # path in s3
+                object_name=item_path,  # path in s3
                 file_path=item  # local path to download
             )
 

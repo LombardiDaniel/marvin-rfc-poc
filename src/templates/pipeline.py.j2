@@ -122,6 +122,7 @@ if __name__ == '__main__':
     {% endif %}
 
     kfp.compiler.Compiler().compile({{ pipeline.pipelineName }}_func, pipeline_file_path)
+    print(BUCKET_PATH)
 
 
     {# # CERTO
