@@ -1,7 +1,7 @@
 '''
 '''
 
-import uuid4
+import uuid
 
 import jinja2
 
@@ -32,12 +32,14 @@ class Renderer:
         )
 
         pipeline_template = env.get_template('pipeline.py.j2')
-        rendererd_pipeline = pipeline_template.render(
+        rendered_pipeline = pipeline_template.render(
             pipeline=self.parsed_yaml
         )
 
+        with open(target_path, 'w', encoding='UTF-8') as file:
+            file.write(rendered_pipeline)
 
-
+        return rendered_pipeline
 
     @staticmethod
     def _parse_yaml(complete_yaml):

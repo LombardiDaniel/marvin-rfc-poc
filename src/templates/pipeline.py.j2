@@ -12,7 +12,7 @@ from s3_utils import S3Utils
 
 
 # - ***Variables for user project*** - #
-PROJECT_NAME = '{{ pipeline.name }}'
+PROJECT_NAME = '{{ pipeline.pipelineName }}'
 
 S3_ENDPOINT_VAR = '{{ pipeline.envVars.S3_ENDPOINT_VAR }}'
 S3_ACCESS_KEY_VAR = '{{ pipeline.envVars.S3_ACCESS_KEY_VAR }}'
@@ -56,41 +56,41 @@ def setup_storage_pipeline_dependencies(files=[]):
 # Uploads dependencies -> colocar isso aqui na main
 setup_minio_pipeline_dependencies(
     {% for file in pipeline.dependencies %}
-    {{ file }},
+    '{{ file }}',
     {% endfor %}
 )
 
 # Generate funcions
-{% for step in pipeline_steps %}
+{% for step in pipeline.pipelineSteps %}
 def {{ step.name }}():
     container = create_container(
     {% for env_var in step.envVars %}
-        {{ env_var.key }}="{{ env_var.value }}",
+        {{ env_var.key }}='{{ env_var.value }}',
     {% endfor %}
     )
     container.name = {{ step.name }}
 
     container.file_inputs = [
     {% for file in step.fileInputs %}
-        {{ file }},
+        '{{ file }}',
     {% endfor %}
     ]
 
     container.file_outputs = [
     {% for file in step.fileOutputs %}
-        {{ file }},
+        '{{ file }}',
     {% endfor %}
     ]
 
-    return container.run('{{container.entrypoint}}')
+    return container.run('{{step.entrypoint}}')
 {% endfor %}
 
 
 @dsl.pipeline(
-    name='{{ pipeline.name }}',
+    name='{{ pipeline.pipelineName }}',
     description='{{ pipeline.description }}'
 )
-def {{ pipeline.pipelineName }}():
+def {{ pipeline.pipelineName }}_func():
 
     {% for step in pipeline.steps %}
     {{ step.name }}_step = {{ step.name }}()
@@ -105,8 +105,6 @@ def {{ pipeline.pipelineName }}():
 # falta montar a main certa
 if __name__ == '__main__':
     global BUCKET_NAME_VAR
-
-    BUCKET_NAME_VAR = get_valid_bucket_name()
 
     # TODO: colocar algum tipo de if aqui, q usa sys.args, e a gnt passa na hr de compilar, se entrar no if, sobe os arquivos e o pipe, cria a run e bora
     setup_storage_pipeline_dependencies(
@@ -127,7 +125,7 @@ if __name__ == '__main__':
 
     pipeline_file_path = f'{PROJECT_NAME}.yaml'
 
-    kfp.compiler.Compiler().compile({{ pipeline.pipelineName }}, pipeline_file_path)
+    kfp.compiler.Compiler().compile({{ pipeline.pipelineName }}_func, pipeline_file_path)
 
 
     {# # CERTO
