@@ -9,13 +9,16 @@ defaultParams:
         - S3_SECRET_KEY: minio_secret
         - S3_ENDPOINT: minio_uri
     dependencies:
-        - requirements.txt
+        # TODO: Colocar essa parada do local no json
+        - requirements.txt: local # default is local ~> means 'setup_kfp' command will upload FROM LOCAL MACHINE
         - test.csv
         - train.csv
         - acquisitor.py
         - data_prep.py
         - train_model.py
         - evaluate.py
+    globalFiles:
+        - requirements.txt
 
 pipelineSteps:
     - name: acquisitor

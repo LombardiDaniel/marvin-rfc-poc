@@ -14,9 +14,10 @@ from s3_utils import S3Utils
 # - ***Variables for user project*** - #
 PROJECT_NAME = '{{ pipeline.pipelineName }}'
 
-S3_ENDPOINT_VAR = '{{ pipeline.defaultParams.envVars.S3_ENDPOINT }}'
-S3_ACCESS_KEY_VAR = '{{ pipeline.defaultParams.envVars.S3_ACCESS_KEY }}'
-S3_SECRET_KEY_VAR = '{{ pipeline.defaultParams.envVars.S3_SECRET_KEY }}'
+{% for env_var in pipeline.defaultParams.envVars %}
+{{ env_var.key }} = '{{ env_var.value }}'
+{% endfor %}
+
 BUCKET_NAME_VAR = S3Utils.replace_invalid_bucket_name_chars('{{ pipeline.defaultParams.storageBucket }}')
 BUCKET_PATH = ''
 
@@ -28,36 +29,43 @@ def create_container(**kwargs):
     return Container(
         setup_command='{{ pipeline.defaultParams.setupCommand }}',
         verbose=True,
-        S3_ENDPOINT=S3_ENDPOINT_VAR,
-        S3_ACCESS_KEY=S3_ACCESS_KEY_VAR,
-        S3_SECRET_KEY=S3_SECRET_KEY_VAR,
+        {% for env_var in pipeline.defaultParams.envVars %}
+        {{ env_var.key }} = '{{ env_var.value }}',
+        {% endfor %}
         BUCKET_NAME=BUCKET_NAME_VAR,
         BUCKET_PATH=BUCKET_PATH,
         **kwargs
     )
 
 
+# TODO: Currentrly this uses only S3, must be adapted for later use with various types (create a masterClass)
 def setup_storage_pipeline_dependencies(files=[]):
     '''
     Manually sets up the s3 objects for the first container.
     '''
 
+    local_files = [
+        file['fileName'] for file in files if file['source'] == 'local'
+    ]
+
     s3 = S3Utils(
-        S3_ENDPOINT_VAR,
-        S3_ACCESS_KEY_VAR,
-        S3_SECRET_KEY_VAR,
+        S3_ENDPOINT,
+        S3_ACCESS_KEY,
+        S3_SECRET_KEY,
         bucket_name=BUCKET_NAME_VAR,
         bucket_path=BUCKET_PATH
     )
 
-    s3.upload(files)
+    s3.upload(local_files)
+
+    # TODO: still needs to treat other file sources
 
 
 # - ***USER DEFINED PIPELINE*** - #
 
 # Generate funcions
 {% for step in pipeline.pipelineSteps %}
-def {{ step.name }}_step_func():
+def {{ make_step_function_name(step.name) }}():
     container = create_container(
     {% for env_var in step.envVars %}
         {{ env_var.key }}='{{ env_var.value }}',
@@ -69,7 +77,7 @@ def {{ step.name }}_step_func():
     {% for file in step.fileInputs %}
         '{{ file }}',
     {% endfor %}
-    {% for file in pipeline.defaultParams.dependencies %}
+    {% for file in pipeline.defaultParams.globalFiles %}
         '{{ file }}',
     {% endfor %}
     ]
@@ -88,14 +96,12 @@ def {{ step.name }}_step_func():
     name='{{ pipeline.pipelineName }}',
     description='{{ pipeline.description }}'
 )
-def {{ pipeline.pipelineName }}_func():
+def {{ make_pipeline_function_name(pipeline.pipelineName) }}():
 
     {% for step in pipeline.pipelineSteps %}
-    {{ step.name }}_step = {{ step.name }}_step_func()
-        {% if loop.index > 0 %}
-            {% if step.runAfter %}
-    {{ step.name }}_step.after({{ step.runAfter }}_step)
-            {% endif %}
+    {{ make_step_function_pointer_name(step.name) }} = {{ make_step_function_name(step.name) }}()
+        {% if step.runAfter %}
+    {{ make_step_function_pointer_name(step.name) }}.after({{ make_step_function_name(step.runAfter) }})
         {% endif %}
     {% endfor %}
 
@@ -108,24 +114,27 @@ if __name__ == '__main__':
 
     # hash = uuid.uuid4()  # o proprio marvin passa o hash pro arquivo final -> template recebe o hash
     # TODO: só entra aqui SE tiver especificado que vai criar run?
-    hash = '{{ pipeline.uuid }}'
+    global HASH_
+    HASH_ = '{{ pipeline.uuid }}'
     date_str = datetime.now().strftime('%Y-%m-%d')
-    BUCKET_PATH = f'{PROJECT_NAME}-{date_str}-{hash}'
+
+    global BUCKET_PATH_
+    BUCKET_PATH_ = f'{PROJECT_NAME}-{date_str}-{HASH_}'
 
     pipeline_file_path = f'{PROJECT_NAME}.yaml'
 
     {% if upload %}
     setup_storage_pipeline_dependencies(
         [
-            {% for file in pipeline.defaultParams.dependencies %}
-            '{{file}}',
+            {% for file_struct in defaultParams.dependencies %}
+            {{ file_struct }},
             {% endfor %}
         ]
     )
     {% endif %}
 
-    kfp.compiler.Compiler().compile({{ pipeline.pipelineName }}_func, pipeline_file_path)
-    print(BUCKET_PATH)
+    kfp.compiler.Compiler().compile({{ make_pipeline_function_name(pipeline.pipelineName) }}, pipeline_file_path)
+    print(BUCKET_PATH_)
 
 
     {# # CERTO

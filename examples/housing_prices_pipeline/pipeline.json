@@ -4,19 +4,47 @@
     "defaultParams": {
         "storageBucket": "housing_prices",
         "setupCommand": "pip install -r requirements.txt",
-        "envVars": {
-            "S3_ACCESS_KEY": "minio_key",
-            "S3_SECRET_KEY": "minio_secret",
-            "S3_ENDPOINT": "minio_uri"
-        },
-        "dependencies": [
-            "requirements.txt",
-            "test.csv",
-            "train.csv",
-            "acquisitor.py",
-            "data_prep.py",
-            "train_model.py",
-            "evaluate.py"
+        "envVars": [{
+                "key": "S3_ACCESS_KEY",
+                "value": "minio_key"
+            },
+            {
+                "key": "S3_SECRET_KEY",
+                "value": "minio_secret"
+            },
+            {
+                "key": "S3_ENDPOINT",
+                "value": "minio_uri"
+            }
+        ],
+        "dependencies": [{
+                "fileName": "requirements.txt",
+                "source": "local"
+            },
+            {
+                "fileName": "test.csv",
+                "source": "local"
+            },
+            {
+                "fileName": "train.csv",
+                "source": "local"
+            },
+            {
+                "fileName": "acquisitor.py",
+                "source": "local"
+            },
+            {
+                "fileName": "data_prep.py",
+                "source": "local"
+            },
+            {
+                "fileName": "train_model.py",
+                "source": "local"
+            },
+            {
+                "fileName": "evaluate.py",
+                "source": "local"
+            }
         ]
     },
     "pipelineSteps": [{

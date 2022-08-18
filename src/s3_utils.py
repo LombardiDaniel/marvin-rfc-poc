@@ -54,7 +54,8 @@ class S3Utils:
     Methods:
         - download(items_list=[], verbose=False) : downloads all objs from items_list to current dir
         - upload(items_list=[], verbose=False) : uploads all objs from items_list to S3 bucket
-        - create_bucket(try_new_hash=False) : Creates the bucket, if try_new_hash is enabled, tries generating a new
+        - create_bucket(try_new_hash=False) : Creates the bucket, if try_new_hash is enabled, tries
+            generating a new
             hash in the case that the current bucket already exists
         - is_valid_bucket_name(bucket_name) : Checks that the bucket_name is of valid naming
         - replace_invalid_bucket_name_chars(bucket_name) : replaces invalid chars with '-'
