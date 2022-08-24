@@ -39,6 +39,7 @@ pipelineSteps:
       fileInputs:
         - test.csv
         - train.csv
+        - data_prep.py
       fileOutputs:
         - X_train.csv
         - y_train.csv
@@ -54,6 +55,7 @@ pipelineSteps:
         - y_train.csv
         - X_test.csv
         - y_test.csv
+        - train_model.py
       fileOutputs:
         - regressionTree
         - regressionLinear
@@ -71,3 +73,4 @@ pipelineSteps:
         - regressionTree
         - regressionLinear
         - randomForest
+        - evaluate.py
