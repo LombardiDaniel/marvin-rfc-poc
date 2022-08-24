@@ -99,6 +99,7 @@ class Renderer:
         rendered_pipeline = pipeline_template.render(
             pipeline=self.parsed_yaml,
             upload=False  # isso vai ser removido do renderer
+            # TODO: remover isso e pensar direito como separar
         )
 
         if auto_format:

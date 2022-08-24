@@ -18,13 +18,19 @@ class MarvinBase:
 
 class MarvinDefaults(MarvinBase):
     '''
+    MarvinDefaults class is used to retrieve defaults from project or marvin install
+    dir.
     '''
 
     MARVIN_DEFAULTS_FILE_NAME = 'marvin_defaults.conf'
 
     def __init__(self, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
+
         config = configparser.ConfigParser()
+        config.optionxform = str  # this option allows us to have upper case letters in our .conf file check for more: # noqa: E501 # pylint: disable=C0301
+        # https://docs.python.org/2/library/configparser.html#ConfigParser.RawConfigParser.optionxform
+        # https://stackoverflow.com/questions/19359556/configparser-reads-capital-keys-and-make-them-lower-case
         self._config_file_path = os.path.join(
             os.getenv('MARVIN_PATH', './'),  # default path is set as './' for current testing
             MarvinDefaults.MARVIN_DEFAULTS_FILE_NAME
@@ -37,10 +43,6 @@ class MarvinDefaults(MarvinBase):
                 self._config_file_path = project_config_path
 
         config.read(self._config_file_path)
+        pipeline_config = dict(config['PIPELINE'])
 
-        # for k, v in config['PIPELINE'].items():
-        #     print(k, v)
-        #     self.__dict__[k] = v
-        
-        self.__dict__['pipelineFileDependencies'] = config['PIPELINE']['pipelineFileDependencies']
-        # self.pipelineFileDependencies = config['PIPELINE']['pipelineFileDependencies']
+        self.__dict__.update(pipeline_config)
