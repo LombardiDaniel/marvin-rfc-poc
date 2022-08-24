@@ -1,6 +1,7 @@
 # because apple
 .DS_Store
 venv.nosync
+venv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
