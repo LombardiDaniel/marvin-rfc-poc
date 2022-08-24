@@ -126,7 +126,7 @@ if __name__ == '__main__':
     {% if upload %}
     setup_storage_pipeline_dependencies(
         [
-            {% for file_struct in defaultParams.dependencies %}
+            {% for file_struct in pipeline.defaultParams.dependencies %}
             {{ file_struct }},
             {% endfor %}
         ]
