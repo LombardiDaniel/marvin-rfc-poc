@@ -45,7 +45,7 @@ def setup_storage_pipeline_dependencies(files=[]):
     '''
 
     local_files = [
-        file['fileName'] for file in files if file['source'] == 'local'
+        file['key'] for file in files if file['value'] == 'local'
     ]
 
     s3 = S3Utils(
@@ -58,7 +58,7 @@ def setup_storage_pipeline_dependencies(files=[]):
 
     s3.upload(local_files)
 
-    # TODO: still needs to treat other file sources
+    # TODO: still needs to treat other file sources -> can even be user defined
 
 
 # - ***USER DEFINED PIPELINE*** - #

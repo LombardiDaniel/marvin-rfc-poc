@@ -18,34 +18,35 @@
             }
         ],
         "dependencies": [{
-                "fileName": "requirements.txt",
-                "source": "local"
+                "key": "requirements.txt",
+                "value": "local"
             },
             {
-                "fileName": "test.csv",
-                "source": "local"
+                "key": "test.csv",
+                "value": "local"
             },
             {
-                "fileName": "train.csv",
-                "source": "local"
+                "key": "train.csv",
+                "value": "local"
             },
             {
-                "fileName": "acquisitor.py",
-                "source": "local"
+                "key": "acquisitor.py",
+                "value": "local"
             },
             {
-                "fileName": "data_prep.py",
-                "source": "local"
+                "key": "data_prep.py",
+                "value": "local"
             },
             {
-                "fileName": "train_model.py",
-                "source": "local"
+                "key": "train_model.py",
+                "value": "local"
             },
             {
-                "fileName": "evaluate.py",
-                "source": "local"
+                "key": "evaluate.py",
+                "value": "local"
             }
-        ]
+        ],
+        "globalFiles": ["requirements.txt"]
     },
     "pipelineSteps": [{
             "name": "acquisitor",

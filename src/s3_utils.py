@@ -26,6 +26,9 @@ from minio import Minio
 
 
 def log(*args, **kwargs):
+    '''
+    Simple log function to be used with docker ~> simple stdout logging.
+    '''
     print('[INFO][MinioUtils]::', *args, **kwargs)
 
 

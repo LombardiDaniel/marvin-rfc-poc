@@ -6,7 +6,7 @@ defaultParams:
     setupCommand: pip install -r requirements.txt
     envVars:
         - S3_ACCESS_KEY: minio_key
-        - S3_SECRET_KEY: minio_secret
+        - S3_SECRET_KEY: $MINIO_SECRET_KEY # Since this key starts with '$', it will be fetched from 'envFile'
         - S3_ENDPOINT: minio_uri
     dependencies:
         # TODO: Colocar essa parada do local no json
@@ -19,12 +19,14 @@ defaultParams:
         - evaluate.py
     globalFiles:
         - requirements.txt
+    envFile:
+        .env
 
 pipelineSteps:
     - name: acquisitor
       description: Acquisitor
       entrypoint: python acquisitor.py
-      ennVars:
+      envVars:
         - MY_ENV_VAR: test_specific_env
       fileInputs:
         - test.csv

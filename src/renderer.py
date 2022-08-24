@@ -1,6 +1,7 @@
 '''
 Renderer Class, to be used by the MARVIN.ai CLI.
 '''
+
 import os
 
 from jinja2 import Environment, FileSystemLoader
@@ -114,7 +115,7 @@ class Renderer:
 
 # TODO: remover isso aqui e criar arquivo de test
 if __name__ == '__main__':
-    import json
+    import yaml
     import uuid
 
     d = {}
