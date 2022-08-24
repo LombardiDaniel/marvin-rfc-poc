@@ -82,12 +82,15 @@ class Parser(MarvinBase):
 
         defaults = MarvinDefaults(self.project_path)
 
-        for env_var in ctx['envVars']:
-            if env_var['key'].startswith(defaults.envVarFromEnvFilePrefix):  # pylint: disable=E1101
-                env_var_name_in_file = env_var['key'].split(defaults.envVarFromEnvFilePrefix)[-1]  # pylint: disable=E1101
+        for i, env_var in enumerate(ctx['envVars']):
+            if env_var['value'].startswith(defaults.envVarFromEnvFilePrefix):  # pylint: disable=E1101
+                env_var_name_in_file = env_var['value'].split(defaults.envVarFromEnvFilePrefix, maxsplit=1)[-1]  # noqa: E501 # pylint: disable=E1101, C0301
 
                 # we replace the env var in the yaml from the one present in the env_file
-                ctx['envVars']['value'] = env_vars_from_file[env_var_name_in_file]  # noqa: E501 # pylint: disable=C0301
+                for file_env_var in env_vars_from_file:
+                    if file_env_var['key'] == env_var_name_in_file:
+                        print(ctx['envVars'][i])
+                        ctx['envVars'][i]['value'] = file_env_var['value']
 
         return ctx
 
