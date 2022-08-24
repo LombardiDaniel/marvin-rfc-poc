@@ -101,7 +101,7 @@ def {{ make_pipeline_function_name(pipeline.pipelineName) }}():
     {% for step in pipeline.pipelineSteps %}
     {{ make_step_function_pointer_name(step.name) }} = {{ make_step_function_name(step.name) }}()
         {% if step.runAfter %}
-    {{ make_step_function_pointer_name(step.name) }}.after({{ make_step_function_name(step.runAfter) }})
+    {{ make_step_function_pointer_name(step.name) }}.after({{ make_step_function_pointer_name(step.runAfter) }})
         {% endif %}
     {% endfor %}
 
