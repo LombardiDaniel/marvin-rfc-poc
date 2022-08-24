@@ -22,6 +22,7 @@ class MarvinDefaults(MarvinBase):
     dir.
     '''
 
+    # TODO: fazer buscar rimeiro no marvin base dpois no projeto
     MARVIN_DEFAULTS_FILE_NAME = 'marvin_defaults.conf'
 
     def __init__(self, *args, **kwargs):

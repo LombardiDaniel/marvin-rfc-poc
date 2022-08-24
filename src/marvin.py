@@ -11,5 +11,14 @@ if __name__ == '__main__':
 
     p = Parser(project_path='.', user_defined_yaml=y)
 
-    r = Renderer(p.json, uuid.uuid4())
+    r = Renderer(p.dict, uuid.uuid4())
     r.render('../examples/housing_prices_pipeline/rendered_pipe_from_user_yaml.py', True)
+
+
+    # tmp:
+    # if user_command == 'marvin pipeline upload_dependencies':
+    #     COMMAND = 'python pipeline.py --op upload_to_s3 --bucket_name = '
+    #
+    #     subprocess.run(
+    #         ['/bin/sh', '-c', COMMAND]
+    #     )

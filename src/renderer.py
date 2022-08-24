@@ -36,9 +36,9 @@ class Renderer:
 
     TEMPLATES_DIR = f'{os.path.dirname(os.path.realpath(__file__))}/templates'
 
-    STEP_FUNCTION_TAIL = '_step_func'
-    STEP_FUNCTION_POINTER_TAIL = '_step_func'
-    PIPELINE_FUNCTION_TAIL = '_step_func'
+    STEP_FUNCTION_SUFFIX = '_step_func'
+    STEP_FUNCTION_POINTER_SUFFIX = '_step_pointer_func'
+    PIPELINE_FUNCTION_SUFFIX = '_pipe_func'
 
     def __init__(self, parsed_yaml, uuid_str):
         self.parsed_yaml = parsed_yaml
@@ -50,7 +50,7 @@ class Renderer:
         Helper function to generate the step funcion name to be used in the
         rendered file.
         '''
-        return step_name + Renderer.STEP_FUNCTION_TAIL
+        return step_name + Renderer.STEP_FUNCTION_SUFFIX
 
     @staticmethod
     def make_step_function_pointer_name(step_name):
@@ -58,7 +58,7 @@ class Renderer:
         Helper function to generate the step funcion pointer name to be used in
         the rendered file.
         '''
-        return step_name + Renderer.STEP_FUNCTION_POINTER_TAIL
+        return step_name + Renderer.STEP_FUNCTION_POINTER_SUFFIX
 
     @staticmethod
     def make_pipeline_function_name(pipeline_name):
@@ -66,7 +66,7 @@ class Renderer:
         Helper function to generate the pipeline funcion name to be used in the
         rendered file.
         '''
-        return pipeline_name + Renderer.PIPELINE_FUNCTION_TAIL
+        return pipeline_name + Renderer.PIPELINE_FUNCTION_SUFFIX
 
     def render(self, target_path=None, auto_format=True):
         '''

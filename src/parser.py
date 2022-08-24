@@ -26,7 +26,7 @@ class Parser(MarvinBase):
     '''
 
     @property
-    def json(self):
+    def dict(self):
         '''
         Generates the json needed for the Renderer.
         '''
@@ -83,8 +83,8 @@ class Parser(MarvinBase):
         defaults = MarvinDefaults(self.project_path)
 
         for env_var in ctx['envVars']:
-            if env_var['key'].startswith(defaults.envVarFromEnvFileHead):  # pylint: disable=E1101
-                env_var_name_in_file = env_var['key'].split(defaults.envVarFromEnvFileHead)[-1]  # pylint: disable=E1101
+            if env_var['key'].startswith(defaults.envVarFromEnvFilePrefix):  # pylint: disable=E1101
+                env_var_name_in_file = env_var['key'].split(defaults.envVarFromEnvFilePrefix)[-1]  # pylint: disable=E1101
 
                 # we replace the env var in the yaml from the one present in the env_file
                 ctx['envVars']['value'] = env_vars_from_file[env_var_name_in_file]  # noqa: E501 # pylint: disable=C0301
@@ -142,4 +142,4 @@ if __name__ == '__main__':
     p = Parser(project_path='.', user_defined_yaml=y)
 
     with open('test.json', 'w', encoding='UTF-8') as f:
-        f.write(json.dumps(p.json))
+        f.write(json.dumps(p.dict))

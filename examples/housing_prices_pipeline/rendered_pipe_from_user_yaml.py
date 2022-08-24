@@ -151,21 +151,21 @@ def evaluate_step_func():
     name="pipeline_housing_prices",
     description="Pipeline for presentation of famous housing_prices problem",
 )
-def pipeline_housing_prices_step_func():
+def pipeline_housing_prices_pipe_func():
 
-    acquisitor_step_func = acquisitor_step_func()
+    acquisitor_step_pointer_func = acquisitor_step_func()
 
-    data_prep_step_func = data_prep_step_func()
+    data_prep_step_pointer_func = data_prep_step_func()
 
-    data_prep_step_func.after(acquisitor_step_func)
+    data_prep_step_pointer_func.after(acquisitor_step_pointer_func)
 
-    train_model_step_func = train_model_step_func()
+    train_model_step_pointer_func = train_model_step_func()
 
-    train_model_step_func.after(data_prep_step_func)
+    train_model_step_pointer_func.after(data_prep_step_pointer_func)
 
-    evaluate_step_func = evaluate_step_func()
+    evaluate_step_pointer_func = evaluate_step_func()
 
-    evaluate_step_func.after(train_model_step_func)
+    evaluate_step_pointer_func.after(train_model_step_pointer_func)
 
 
 # falta montar a main certa
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     # hash = uuid.uuid4()  # o proprio marvin passa o hash pro arquivo final -> template recebe o hash
     # TODO: só entra aqui SE tiver especificado que vai criar run?
     global HASH_
-    HASH_ = "6acee885-996f-4673-9c5f-45f38967f695"
+    HASH_ = "f10789eb-4909-4c59-bb8b-8e96f2455e3c"  # precisa tirar o UUID desse arquivo, vai receber
     date_str = datetime.now().strftime("%Y-%m-%d")
 
     global BUCKET_PATH_
@@ -186,6 +186,6 @@ if __name__ == "__main__":
     pipeline_file_path = f"{PROJECT_NAME}.yaml"
 
     kfp.compiler.Compiler().compile(
-        pipeline_housing_prices_step_func, pipeline_file_path
+        pipeline_housing_prices_pipe_func, pipeline_file_path
     )
     print(BUCKET_PATH_)
