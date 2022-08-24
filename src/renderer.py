@@ -29,9 +29,9 @@ class Renderer:
             file (using python black) for better user readability.
 
         @staticmethods
-        - make_step_function_name() : Helper function for renderer funciton naming.
-        - make_step_function_pointer_name() : Helper function for renderer funciton naming.
-        - make_pipeline_function_name() : Helper function for renderer funciton naming.
+        - make_step_function_name() : Helper function for renderer function naming.
+        - make_step_function_pointer_name() : Helper function for renderer function naming.
+        - make_pipeline_function_name() : Helper function for renderer function naming.
     '''
 
     TEMPLATES_DIR = f'{os.path.dirname(os.path.realpath(__file__))}/templates'
