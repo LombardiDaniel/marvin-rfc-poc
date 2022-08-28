@@ -2,8 +2,10 @@
 General Utils for other modules.
 '''
 
-import configparser
 import os
+import shutil
+
+import click
 
 
 class Utils:
@@ -30,3 +32,36 @@ class Utils:
                 'key': k,
                 'value': v
             }
+
+    @staticmethod
+    def copy_dir_from_template(src: str, dst: str, prompt_overwrite=True):
+        '''
+        equivalent of:
+            `cp $SRC/* $DST`
+        '''
+
+        for file_name in os.listdir(src):
+            # construct full file paths
+            source = os.path.join(src, file_name)
+            destination = os.path.join(dst, file_name)
+
+            if prompt_overwrite:
+                yes = click.prompt(f'{destination} already exists, overwrite? (y/n)', type=str)
+
+                if yes != 'y':
+                    continue
+
+            shutil.copy(source, destination)
+
+    @staticmethod
+    def clean_dirname(dirname):
+        '''
+        removes invalid chars from dirname
+        '''
+
+        invalid_chars = '/ <>:\\/|?*\0'
+
+        for char in invalid_chars:
+            dirname = dirname.replace(char, '-')
+
+        return dirname
