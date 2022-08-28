@@ -60,3 +60,6 @@ if __name__ == '__main__':
     #     subprocess.run(
     #         ['/bin/sh', '-c', COMMAND]
     #     )
+
+# from repo home folder:
+# export "MARVIN_PATH"="$(pwd)/src" && export PATH=$PATH:$MARVIN_PATH
