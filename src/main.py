@@ -78,7 +78,7 @@ def compile(pipeline_file, verbose, debug):
     '''
 
     m = Marvin()
-    m.compile_pipeline()
+    m.compile_pipeline(pipeline_file, verbose, debug)
 
 
 if __name__ == '__main__':

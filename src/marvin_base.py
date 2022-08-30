@@ -24,11 +24,10 @@ class MarvinBase:  # pylint: disable=R0903
 
     def __init__(self, *args, project_path=os.getcwd(), **kwargs):  # pylint: disable=W0613
         self.project_path = os.path.abspath(project_path)
-        self.tmp_dir = os.path.join(os.getenv('$HOME'), MarvinBase.TEMP_PIPELINES_DIR)
+        self.tmp_dir = os.path.join(os.getenv('HOME'), MarvinBase.TEMP_PIPELINES_DIR)
 
         if not os.path.exists(self.tmp_dir):
             os.makedirs(self.tmp_dir)
-
 
         self.python3_path = os.path.join(MARVIN_PATH, MarvinBase.INTERNAL_PYTHON_PATH)
 
