@@ -36,7 +36,7 @@ class Marvin(MarvinBase):
         self.uuid = uuid4() if uuid is None else uuid
         self.pipeline_py = None
 
-    def _render_pipeline(self, verbose, debug):
+    def _render_pipeline(self, usr_yaml, verbose, debug, *args, **kwargs):
         '''
         Also sets self.pipeline_py attribute.
         Loads and compiles the user defined pipline.
@@ -49,21 +49,21 @@ class Marvin(MarvinBase):
         '''
 
         usr_pipeline = {}
-        with open(self.project_path, 'r', encoding='UTF-8') as file:
+        with open(usr_yaml, 'r', encoding='UTF-8') as file:
             usr_pipeline = yaml.load(file, Loader=yaml.FullLoader)
 
         p = Parser(project_path=self.project_path, user_defined_yaml=usr_pipeline)
 
         r = Renderer(p.dict, str(self.uuid))
 
-        self.pipeline_py = Utils.clean_dirname(p.dict['pipelineName'])
+        self.pipeline_py = Utils.clean_dirname(p.dict['pipelineName'] + '.py')
         if debug:  # save temporary files in project directory
             r.render(target_path=self.pipeline_py)
         else:
             self.pipeline_py = os.path.join(self.tmp_dir, self.pipeline_py)
             r.render(target_path=self.pipeline_py)
 
-    def _compile_pieline(self, verbose, debug):
+    def _compile_pipeline(self, verbose, debug, *args, **kwargs):
         '''
         Compiles using the subprocess module.
         '''
@@ -78,9 +78,9 @@ class Marvin(MarvinBase):
         except subprocess.CalledProcessError as exp:
             click.prompt(f'{exp}::Error in Compiling pipeline: "{self.pipeline_py}"')
 
-    def compile_pieline(self, *args, **kwargs):
+    def compile_pipeline(self, *args, **kwargs):
         '''
         '''
 
         self._render_pipeline(*args, **kwargs)
-        self._compile_pieline(*args, **kwargs)
+        self._compile_pipeline(*args, **kwargs)

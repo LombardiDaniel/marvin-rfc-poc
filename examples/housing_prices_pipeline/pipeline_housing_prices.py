@@ -217,7 +217,7 @@ if __name__ == "__main__":
     # hash = uuid.uuid4()  # o proprio marvin passa o hash pro arquivo final -> template recebe o hash
     # TODO: só entra aqui SE tiver especificado que vai criar run?
     global HASH_
-    HASH_ = "129972e8-3086-451b-9418-1b83208575bf"  # precisa tirar o UUID desse arquivo, vai receber
+    HASH_ = "f1c1842f-d52b-4f01-98d1-d49d2758f663"  # precisa tirar o UUID desse arquivo, vai receber
     date_str = datetime.now().strftime("%Y-%m-%d")
 
     global BUCKET_PATH_
