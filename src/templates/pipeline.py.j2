@@ -1,7 +1,7 @@
 '''
 Jinja template for pipeline creation.
 '''
-
+import argparse
 from datetime import datetime
 
 import kfp
@@ -9,6 +9,23 @@ from kfp import dsl
 
 from container_wrapper import ContainerWrapper as Container
 from s3_utils import S3Utils
+
+
+ARG_OPS = [
+    'compile_pieline',
+    'create_bucket',
+    'prepare_env',
+    'upload_pipeline',
+    'generate_run'
+]
+
+ARGS_OPS_ENUM_DICT = {
+    'compile_pieline': 0,
+    'create_bucket': 1,
+    'prepare_env': 2,  # upload files to storage[0]
+    'upload_pipeline': 3,
+    'generate_run': 4,
+}
 
 
 # - ***Variables for user project*** - #
@@ -66,6 +83,10 @@ def setup_storage_pipeline_dependencies(files=[]):
 # Generate funcions
 {% for step in pipeline.pipelineSteps %}
 def {{ make_step_function_name(step.name) }}():
+    '''
+    {{step.description}}
+    '''
+
     container = create_container(
     {% for env_var in step.envVars %}
         {{ env_var.key }}='{{ env_var.value }}',
@@ -108,7 +129,11 @@ def {{ make_pipeline_function_name(pipeline.pipelineName) }}():
 
 # falta montar a main certa
 if __name__ == '__main__':
-    # TODO: colocar algum tipo de if aqui, q usa sys.args, e a gnt passa na hr de compilar, se entrar no if, sobe os arquivos e o pipe, cria a run e bora
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-h', '--hash', help='UUID for storage_bucket/run.')
+    parser.add_argument('op', type=str, choices=ARG_OPS, help='Operation')
+    args = parser.parse_args()
 
     PROJECT_NAME = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
 
@@ -133,9 +158,7 @@ if __name__ == '__main__':
     )
     {% endif %}
 
-    kfp.compiler.Compiler().compile({{ make_pipeline_function_name(pipeline.pipelineName) }}, pipeline_file_path)
-    print(BUCKET_PATH_)
-
+    {# kfp.compiler.Compiler().compile({{ make_pipeline_function_name(pipeline.pipelineName) }}, pipeline_file_path) #}
 
     {# # CERTO
     pipeline_file_path = 'pipelines.yaml' # extract it from your database
@@ -143,3 +166,25 @@ if __name__ == '__main__':
 
     client = kfp.Client()
     pipeline = client.pipeline_uploads.upload_pipeline(pipeline_file_path, name=pipeline_name) #}
+
+    # OPERATIONS::
+    op_num = ARGS_OPS_ENUM_DICT[args.op]
+
+    if op_num >= ARG_OPS.index('compile_pieline'):
+        kfp.compiler.Compiler().compile(
+            {{ make_pipeline_function_name(pipeline.pipelineName) }},
+            pipeline_file_path
+        )
+
+    if op_num >= ARG_OPS.index('create_bucket'):
+        S3Utils.create_bucket(BUCKET_NAME_VAR)
+
+    if op_num >= ARG_OPS.index('prepare_env'):
+        setup_storage_pipeline_dependencies()
+        print(f"Bucket Path: '{BUCKET_PATH_}'")
+
+    if op_num >= ARG_OPS.index('upload_pipeline'):  # not yet supported
+        pass
+
+    if op_num >= ARG_OPS.index('generate_run'):  # Not yet supported
+        pass

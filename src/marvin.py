@@ -5,7 +5,8 @@ nao sei como faz pra chamr o marvin de diferentes repositorios
 import os
 import shutil
 import json
-from uuid import uuid4 as uuid_gen
+import subprocess
+from uuid import uuid4
 
 import click
 import yaml
@@ -24,20 +25,25 @@ MARVIN_TEMPLATE_OPTIONS = os.listdir(USR_TEMPLATES_DIR)
 class Marvin(MarvinBase):
     '''
     Abstraction/Class to be used by the CLI
+
+    Attributes:
     '''
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, uuid=None, **kwargs):
         super().__init__(self, *args, **kwargs)
 
         self.default = MarvinDefaults()
+        self.uuid = uuid4() if uuid is None else uuid
+        self.pipeline_py = None
 
-    def compile_pipeline(self, verbose, debug, *args, **kwargs):
+    def _render_pipeline(self, verbose, debug):
         '''
+        Also sets self.pipeline_py attribute.
         Loads and compiles the user defined pipline.
         # NOTE: does NOT support imports atm
 
         Args:
-            - verbose (bool) : if true will print out verbose (progress) information.
+            - verbose (bool) : if true will print out verbose/progress information.
             - debug (bool) : if true will save the intermediate (compiled) python
                 file in usr project_dir.
         '''
@@ -48,11 +54,33 @@ class Marvin(MarvinBase):
 
         p = Parser(project_path=self.project_path, user_defined_yaml=usr_pipeline)
 
+        r = Renderer(p.dict, str(self.uuid))
 
-        # TODO: precisa tirar os hashes do arquivinho python gerado ???
-        # NAO DA!!! -> pq o arquivo gerado precisa passar parametros fixos pro KFP?
-        r = Renderer()
+        self.pipeline_py = Utils.clean_dirname(p.dict['pipelineName'])
+        if debug:  # save temporary files in project directory
+            r.render(target_path=self.pipeline_py)
+        else:
+            self.pipeline_py = os.path.join(self.tmp_dir, self.pipeline_py)
+            r.render(target_path=self.pipeline_py)
 
-        target_file_name = ''
-        with open('test.json', 'w', encoding='UTF-8') as f:
-            f.write(json.dumps(p.dict))
+    def _compile_pieline(self, verbose, debug):
+        '''
+        Compiles using the subprocess module.
+        '''
+
+        final_command = f'{self.python3_path} {self.pipeline_py} compile_pieline -h "{self.uuid}"'
+
+        try:
+            subprocess.run(
+                ['/bin/sh', '-c', final_command],
+                check=True
+            )
+        except subprocess.CalledProcessError as exp:
+            click.prompt(f'{exp}::Error in Compiling pipeline: "{self.pipeline_py}"')
+
+    def compile_pieline(self, *args, **kwargs):
+        '''
+        '''
+
+        self._render_pipeline(*args, **kwargs)
+        self._compile_pieline(*args, **kwargs)

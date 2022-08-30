@@ -10,12 +10,23 @@ from kfp import dsl
 from container_wrapper import ContainerWrapper as Container
 from s3_utils import S3Utils
 
+
 ARG_OPS = [
+    'compile_pieline',
     'create_bucket',
     'prepare_env',
     'upload_pipeline',
     'generate_run'
 ]
+
+ARGS_OPS_ENUM_DICT = {
+    'compile_pieline': 0,
+    'create_bucket': 1,
+    'prepare_env': 2,  # upload files to storage[0]
+    'upload_pipeline': 3,
+    'generate_run': 4,
+}
+
 
 # - ***Variables for user project*** - #
 PROJECT_NAME = "pipeline_housing_prices"
@@ -177,20 +188,6 @@ def pipeline_housing_prices_pipe_func():
 # falta montar a main certa
 if __name__ == "__main__":
 
-    # ARG_OPS = [
-    #     'create_bucket',
-    #     'prepare_env',
-    #     'upload_pipeline',
-    #     'generate_run'
-    # ]
-    ARGS_OPS_ENUM_DICT = {
-        'compile_pieline': 0,
-        'create_bucket': 1,
-        'prepare_env': 2,
-        'upload_pipeline': 3,
-        'generate_run': 4,
-    }
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-h', '--hash', help='UUID for storage_bucket/run.')
     parser.add_argument('op', type=str, choices=ARG_OPS, help='Operation')
@@ -224,7 +221,7 @@ if __name__ == "__main__":
         S3Utils.create_bucket(BUCKET_NAME_VAR)
 
     if op_num >= ARG_OPS.index('prepare_env'):
-        S3Utils.create_bucket(BUCKET_NAME_VAR)
+        setup_storage_pipeline_dependencies()
 
     if op_num >= ARG_OPS.index('upload_pipeline'):
         S3Utils.create_bucket(BUCKET_NAME_VAR)

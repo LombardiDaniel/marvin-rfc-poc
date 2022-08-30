@@ -8,8 +8,10 @@ import uuid
 
 import yaml
 
-# from renderer import Renderer
-# from parser import Parser
+
+MARVIN_PATH = os.getenv('MARVIN_PATH', '~/usr/bin/marvin')
+USR_TEMPLATES_DIR = os.path.join(MARVIN_PATH, 'project_templates')
+MARVIN_TEMPLATE_OPTIONS = os.listdir(USR_TEMPLATES_DIR)
 
 
 class MarvinBase:  # pylint: disable=R0903
@@ -17,8 +19,18 @@ class MarvinBase:  # pylint: disable=R0903
     MarvinBase specifies common attributes shared by other marvin modules.
     '''
 
+    INTERNAL_PYTHON_PATH = 'venv/bin/python3'
+    TEMP_PIPELINES_DIR = '/tmp/marvin_pipelines'
+
     def __init__(self, *args, project_path=os.getcwd(), **kwargs):  # pylint: disable=W0613
         self.project_path = os.path.abspath(project_path)
+        self.tmp_dir = os.path.join(os.getenv('$HOME'), MarvinBase.TEMP_PIPELINES_DIR)
+
+        if not os.path.exists(self.tmp_dir):
+            os.makedirs(self.tmp_dir)
+
+
+        self.python3_path = os.path.join(MARVIN_PATH, MarvinBase.INTERNAL_PYTHON_PATH)
 
     # criar alguns objs no marvin base
 
@@ -29,7 +41,6 @@ class MarvinDefaults(MarvinBase):  # pylint: disable=R0903
     dir.
     '''
 
-    # TODO: fazer buscar rimeiro no marvin base dpois no projeto
     MARVIN_DEFAULTS_FILE_NAME = 'marvin_defaults.conf'
 
     def __init__(self, *args, **kwargs):
@@ -57,18 +68,3 @@ class MarvinDefaults(MarvinBase):  # pylint: disable=R0903
 
             config.read(self._config_file_path)
             self.__dict__.update(dict(config['PIPELINE']))  # load user config into obj attributes
-
-
-# class Marvin(MarvinBase):
-#     '''
-#     Marvin instance is the abstraction used in the CLI.
-#     CLI should NOT call renderer or parser directly. -> Or should they (?)
-#     '''
-#
-#     def __init__(self, project_path: str, uuid_str: str, *args, **kwargs):
-#         super().__init__(self, *args, **kwargs)
-#         self.uuid = uuid_str
-#
-#         self.parser = Parser(*args, **kwargs)
-#
-#         self.renderer = Renderer(*args, **kwargs)

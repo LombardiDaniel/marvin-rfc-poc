@@ -15,7 +15,7 @@ import yaml
 from renderer import Renderer
 from parser import Parser
 from utils import Utils, BColors
-
+from marvin import Marvin
 
 MARVIN_PATH = os.getenv('MARVIN_PATH', '~/usr/bin/marvin')
 USR_TEMPLATES_DIR = os.path.join(MARVIN_PATH, 'project_templates')
@@ -77,11 +77,8 @@ def compile(pipeline_file, verbose, debug):
     '''
     '''
 
-    usr_pipeline = {}
-    with open(pipeline_file, 'r', encoding='UTF-8') as file:
-        usr_pipeline = file.load(file, Loader=yaml.FullLoader)
-
-    parser = Parser(project_path='.', user_defined_yaml=usr_pipeline)
+    m = Marvin()
+    m.compile_pipeline()
 
 
 if __name__ == '__main__':
