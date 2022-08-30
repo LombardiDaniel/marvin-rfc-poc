@@ -8,7 +8,24 @@ import shutil
 import click
 
 
+class BColors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    RESET = ENDC
+
+
 class Utils:
+    '''
+    Simple Utils for helping other modules.
+    '''
+
     @staticmethod
     def fix_key_values(k_v_dict):
         '''
@@ -45,10 +62,13 @@ class Utils:
             source = os.path.join(src, file_name)
             destination = os.path.join(dst, file_name)
 
-            if prompt_overwrite:
-                yes = click.prompt(f'{destination} already exists, overwrite? (y/n)', type=str)
+            if os.path.exists(destination) and prompt_overwrite:
+                answ = click.prompt(
+                    f'"{BColors.WARNING}{destination}{BColors.ENDC}" already exists, overwrite? (y/n)',  # noqa: E501 # pylint: disable=C0301
+                    type=str
+                )
 
-                if yes != 'y':
+                if answ != 'y':
                     continue
 
             shutil.copy(source, destination)

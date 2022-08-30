@@ -1,7 +1,7 @@
 """
 Jinja template for pipeline creation.
 """
-
+import argparse
 from datetime import datetime
 
 import kfp
@@ -10,6 +10,12 @@ from kfp import dsl
 from container_wrapper import ContainerWrapper as Container
 from s3_utils import S3Utils
 
+ARG_OPS = [
+    'create_bucket',
+    'prepare_env',
+    'upload_pipeline',
+    'generate_run'
+]
 
 # - ***Variables for user project*** - #
 PROJECT_NAME = "pipeline_housing_prices"
@@ -170,6 +176,27 @@ def pipeline_housing_prices_pipe_func():
 
 # falta montar a main certa
 if __name__ == "__main__":
+
+    # ARG_OPS = [
+    #     'create_bucket',
+    #     'prepare_env',
+    #     'upload_pipeline',
+    #     'generate_run'
+    # ]
+    ARGS_OPS_ENUM_DICT = {
+        'compile_pieline': 0,
+        'create_bucket': 1,
+        'prepare_env': 2,
+        'upload_pipeline': 3,
+        'generate_run': 4,
+    }
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-h', '--hash', help='UUID for storage_bucket/run.')
+    parser.add_argument('op', type=str, choices=ARG_OPS, help='Operation')
+    args = parser.parse_args()
+
+
     # TODO: colocar algum tipo de if aqui, q usa sys.args, e a gnt passa na hr de compilar, se entrar no if, sobe os arquivos e o pipe, cria a run e bora
 
     PROJECT_NAME = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
@@ -177,7 +204,7 @@ if __name__ == "__main__":
     # hash = uuid.uuid4()  # o proprio marvin passa o hash pro arquivo final -> template recebe o hash
     # TODO: só entra aqui SE tiver especificado que vai criar run?
     global HASH_
-    HASH_ = "f10789eb-4909-4c59-bb8b-8e96f2455e3c"  # precisa tirar o UUID desse arquivo, vai receber
+    HASH_ = args.hash  # precisa tirar o UUID desse arquivo, vai receber
     date_str = datetime.now().strftime("%Y-%m-%d")
 
     global BUCKET_PATH_
@@ -185,7 +212,22 @@ if __name__ == "__main__":
 
     pipeline_file_path = f"{PROJECT_NAME}.yaml"
 
-    kfp.compiler.Compiler().compile(
-        pipeline_housing_prices_pipe_func, pipeline_file_path
-    )
-    print(BUCKET_PATH_)
+    # OPERATIONS::
+    op_num = ARGS_OPS_ENUM_DICT[args.op]
+
+    if op_num >= ARG_OPS.index('compile_pieline'):
+        kfp.compiler.Compiler().compile(
+            pipeline_housing_prices_pipe_func, pipeline_file_path
+        )
+
+    if op_num >= ARG_OPS.index('create_bucket'):
+        S3Utils.create_bucket(BUCKET_NAME_VAR)
+
+    if op_num >= ARG_OPS.index('prepare_env'):
+        S3Utils.create_bucket(BUCKET_NAME_VAR)
+
+    if op_num >= ARG_OPS.index('upload_pipeline'):
+        S3Utils.create_bucket(BUCKET_NAME_VAR)
+
+    if op_num >= ARG_OPS.index('generate_run'):  # Not yet supported
+        S3Utils.create_bucket(BUCKET_NAME_VAR)

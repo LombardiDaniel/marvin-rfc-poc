@@ -139,7 +139,7 @@ if __name__ == '__main__':
     import json
 
     y = {}
-    with open('../examples/housing_prices_pipeline/pipeline.yaml', 'r', encoding='UTF=8') as file:
+    with open('../examples/housing_prices_pipeline/pipeline.yaml', 'r', encoding='UTF-8') as file:
         y = yaml.load(file, Loader=yaml.FullLoader)
 
     p = Parser(project_path='.', user_defined_yaml=y)

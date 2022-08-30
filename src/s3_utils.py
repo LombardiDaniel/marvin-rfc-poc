@@ -152,7 +152,11 @@ class S3Utils:
 
             self.bucket_name = bucket_name_tmp
 
-        client.make_bucket(self.bucket_name)
+        if not client.bucket_exists(self.bucket_name):
+            client.make_bucket(self.bucket_name)
+
+        else:
+            print(f'Bucket "{self.bucket_name}" already existst.')
 
         return self.bucket_name
 

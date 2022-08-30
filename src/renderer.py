@@ -108,8 +108,9 @@ class Renderer:
                 mode=black.FileMode(line_length=82)
             )
 
-        with open(target_path, 'w', encoding='UTF-8') as file:
-            file.write(rendered_pipeline)
+        if target_path is not None:
+            with open(target_path, 'w', encoding='UTF-8') as file:
+                file.write(rendered_pipeline)
 
         return rendered_pipeline
 
@@ -125,4 +126,4 @@ if __name__ == '__main__':
 
     r = Renderer(d, uuid.uuid4())
 
-    r.render('rendered_file.py', True)
+    r.render('rendered_file.py', )

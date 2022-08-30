@@ -17,7 +17,7 @@ class MarvinBase:  # pylint: disable=R0903
     MarvinBase specifies common attributes shared by other marvin modules.
     '''
 
-    def __init__(self, *args, project_path='.', **kwargs):  # pylint: disable=W0613
+    def __init__(self, *args, project_path=os.getcwd(), **kwargs):  # pylint: disable=W0613
         self.project_path = os.path.abspath(project_path)
 
     # criar alguns objs no marvin base

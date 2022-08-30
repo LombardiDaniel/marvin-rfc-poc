@@ -1,14 +1,16 @@
-#!/usr/bin/env python3
 '''
 nao sei como faz pra chamr o marvin de diferentes repositorios
 '''
 
 import os
 import shutil
+import json
 from uuid import uuid4 as uuid_gen
 
 import click
+import yaml
 
+from marvin_base import MarvinBase, MarvinDefaults
 from renderer import Renderer
 from parser import Parser
 from utils import Utils
@@ -19,47 +21,38 @@ USR_TEMPLATES_DIR = os.path.join(MARVIN_PATH, 'project_templates')
 MARVIN_TEMPLATE_OPTIONS = os.listdir(USR_TEMPLATES_DIR)
 
 
-@click.command()
-@click.option('--project_dir',
-              type=click.Path(exists=True),
-              default=lambda: os.getcwd()
-              )
-@click.option('-v', '--verbose', is_flag=True, default=False)
-@click.option('--template',
-              type=click.Choice(MARVIN_TEMPLATE_OPTIONS, case_sensitive=False),
-              default='clean'
-              )
-@click.option('--name',
-              default=lambda: os.path.basename(os.getcwd())
-              )
-def init(project_dir, verbose, template, name):
+class Marvin(MarvinBase):
     '''
+    Abstraction/Class to be used by the CLI
     '''
-    project_name = Utils.clean_dirname(name)
-    template_src = os.path.join(USR_TEMPLATES_DIR, template)
 
-    if template == 'clean':
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
 
-        Utils.copy_dir_from_template(template_src, project_dir)
+        self.default = MarvinDefaults()
 
-        name_line = ''
-        with open(os.path.join(project_dir, '.marvin'), 'r', encoding='UTF-8') as f:
-            name_line = f.read().format(project_name)
+    def compile_pipeline(self, verbose, debug, *args, **kwargs):
+        '''
+        Loads and compiles the user defined pipline.
+        # NOTE: does NOT support imports atm
 
-        with open(os.path.join(project_dir, '.marvin'), 'w', encoding='UTF-8') as f:
-            f.write(name_line)
+        Args:
+            - verbose (bool) : if true will print out verbose (progress) information.
+            - debug (bool) : if true will save the intermediate (compiled) python
+                file in usr project_dir.
+        '''
+
+        usr_pipeline = {}
+        with open(self.project_path, 'r', encoding='UTF-8') as file:
+            usr_pipeline = yaml.load(file, Loader=yaml.FullLoader)
+
+        p = Parser(project_path=self.project_path, user_defined_yaml=usr_pipeline)
 
 
-if __name__ == '__main__':
-    init()  # pylint: disable=E1120
+        # TODO: precisa tirar os hashes do arquivinho python gerado ???
+        # NAO DA!!! -> pq o arquivo gerado precisa passar parametros fixos pro KFP?
+        r = Renderer()
 
-    # tmp:
-    # if user_command == 'marvin pipeline upload_dependencies':
-    #     COMMAND = 'python pipeline.py --op upload_to_s3 --bucket_name = '
-    #
-    #     subprocess.run(
-    #         ['/bin/sh', '-c', COMMAND]
-    #     )
-
-# from repo home folder:
-# export "MARVIN_PATH"="$(pwd)/src" && export PATH=$PATH:$MARVIN_PATH
+        target_file_name = ''
+        with open('test.json', 'w', encoding='UTF-8') as f:
+            f.write(json.dumps(p.dict))
