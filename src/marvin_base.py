@@ -4,9 +4,11 @@ Base classes inherited by other marvin modules.
 
 import os
 import configparser
-import uuid
+from uuid import uuid4
 
 import yaml
+
+from utils import Utils
 
 
 MARVIN_PATH = os.getenv('MARVIN_PATH', '~/usr/bin/marvin')
@@ -22,16 +24,76 @@ class MarvinBase:  # pylint: disable=R0903
     INTERNAL_PYTHON_PATH = 'venv/bin/python3'
     TEMP_PIPELINES_DIR = '/tmp/marvin_pipelines'
 
-    def __init__(self, *args, project_path=os.getcwd(), **kwargs):  # pylint: disable=W0613
-        self.project_path = os.path.abspath(project_path)
-        self.tmp_dir = os.path.join(os.getenv('HOME'), MarvinBase.TEMP_PIPELINES_DIR)
+    @property
+    def uuid(self):
+        '''
+        '''
+        curr_uuid = self._get_marvin_dict()['LAST_UUID']
+        if curr_uuid in ['None', '{}', None, 'NONE', 'none']:
+            self.uuid = str(uuid4())
 
+        return self._get_marvin_dict()['LAST_UUID']
+
+    @uuid.setter
+    def uuid(self, new_uuid):
+        '''
+        '''
+        self._set_marvin_dict(
+            self._get_marvin_dict().update({
+                'LAST_UUID': new_uuid
+            })
+        )
+
+    def __init__(self, *args, project_dir=os.getcwd(), **kwargs):  # pylint: disable=W0613
+        self.project_dir = os.path.abspath(project_dir)
+
+        self.tmp_dir = os.path.join(os.getenv('HOME'), MarvinBase.TEMP_PIPELINES_DIR)
         if not os.path.exists(self.tmp_dir):
             os.makedirs(self.tmp_dir)
 
+        self.logs_dir = os.path.join(self.tmp_dir, '/logs/')
+        if not os.path.exists(self.logs_dir):
+            os.makedirs(self.logs_dir)
+
         self.python3_path = os.path.join(MARVIN_PATH, MarvinBase.INTERNAL_PYTHON_PATH)
 
-    # criar alguns objs no marvin base
+        # self._load_marvin_dict()
+        # self.uuid = self.PROJECT_UUID
+
+    def setup_marvin_base_file(self, project_name):
+        '''
+        '''
+
+        self._set_marvin_dict(
+            self._get_marvin_dict().update({
+                'PROJECT_NAME': Utils.clean_dirname(project_name)
+            })
+        )
+
+    def _get_marvin_dict(self):
+        '''
+        '''
+
+        marvin_dict = {}
+        with open(os.path.join(self.project_dir, '.marvin'), 'r', encoding='UTF-8') as f:
+            for line in f.readlines():
+
+                k, v = line.splitlines().split('=', maxsplit=1)
+                marvin_dict[k] = v
+
+        return marvin_dict
+
+    def _set_marvin_dict(self, new_dict):
+        '''
+        '''
+
+        contents = ''
+        for k, v in new_dict.items():
+            contents += f'{k}={v}'
+            contents += '\n'
+
+        with open(os.path.join(self.project_dir, '.marvin'), 'w', encoding='UTF-8') as f:
+            f.write(contents)
 
 
 class MarvinDefaults(MarvinBase):  # pylint: disable=R0903
@@ -59,8 +121,8 @@ class MarvinDefaults(MarvinBase):  # pylint: disable=R0903
         config.read(self._config_file_path)
         self.__dict__.update(dict(config['PIPELINE']))  # load default config into obj attributes
 
-        if self.project_path is not None:
-            project_config_path = os.path.join(self.project_path,
+        if self.project_dir is not None:
+            project_config_path = os.path.join(self.project_dir,
                                                MarvinDefaults.MARVIN_DEFAULTS_FILE_NAME)
             if os.path.exists(project_config_path):
                 self._config_file_path = project_config_path

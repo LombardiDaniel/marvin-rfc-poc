@@ -71,7 +71,7 @@ class Parser(MarvinBase):
             - ctx (dict) : the same context, but with added envVars IN PLAIN TEXT.
         '''
 
-        env_file_path = os.path.join(self.project_path, self.yaml['defaultParams']['envFile'])
+        env_file_path = os.path.join(self.project_dir, self.yaml['defaultParams']['envFile'])
         env_vars_from_file = []
         with open(env_file_path, 'r', encoding='UTF-8') as f:  # pylint: disable=W0621, C0103
             block = f.readline().replace(' ', '').replace('\n', '').split('=', maxsplit=1)
@@ -80,7 +80,7 @@ class Parser(MarvinBase):
                 'value': block[1]
             })
 
-        defaults = MarvinDefaults(self.project_path)
+        defaults = MarvinDefaults(self.project_dir)
 
         for i, env_var in enumerate(ctx['envVars']):
             if env_var['value'].startswith(defaults.envVarFromEnvFilePrefix):  # pylint: disable=E1101
@@ -104,7 +104,7 @@ class Parser(MarvinBase):
             }
         '''
 
-        prj_defaults = MarvinDefaults(self.project_path)
+        prj_defaults = MarvinDefaults(self.project_dir)
 
         # Fix dependencies
         for i, file_name in enumerate(self.yaml['defaultParams']['dependencies']):
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     with open('../examples/housing_prices_pipeline/pipeline.yaml', 'r', encoding='UTF-8') as file:
         y = yaml.load(file, Loader=yaml.FullLoader)
 
-    p = Parser(project_path='.', user_defined_yaml=y)
+    p = Parser(project_dir='.', user_defined_yaml=y)
 
     with open('test.json', 'w', encoding='UTF-8') as f:
         f.write(json.dumps(p.dict))

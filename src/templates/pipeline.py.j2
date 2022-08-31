@@ -140,14 +140,10 @@ if __name__ == '__main__':
 
     PROJECT_NAME = S3Utils.replace_invalid_bucket_name_chars(PROJECT_NAME)
 
-    # hash = uuid.uuid4()  # o proprio marvin passa o hash pro arquivo final -> template recebe o hash
-    # TODO: só entra aqui SE tiver especificado que vai criar run?
-    global HASH_
-    HASH_ = '{{ pipeline.uuid }}'  # precisa tirar o UUID desse arquivo, vai receber
+    uuid_hash = args.hash
     date_str = datetime.now().strftime('%Y-%m-%d')
 
-    global BUCKET_PATH_
-    BUCKET_PATH_ = f'{PROJECT_NAME}-{date_str}-{HASH_}'
+    bucket_path = f'{PROJECT_NAME}-{date_str}-{uuid_hash}'
 
     pipeline_file_path = f'{PROJECT_NAME}.yaml'
 
@@ -161,8 +157,6 @@ if __name__ == '__main__':
     )
     {% endif %}
 
-    {# kfp.compiler.Compiler().compile({{ make_pipeline_function_name(pipeline.pipelineName) }}, pipeline_file_path) #}
-
     {# # CERTO
     pipeline_file_path = 'pipelines.yaml' # extract it from your database
     pipeline_name = 'Your Pipeline Name'
@@ -173,37 +167,40 @@ if __name__ == '__main__':
     # OPERATIONS::
     op_num = ARGS_OPS_ENUM_DICT[args.op]
 
-    if op_num >= ARG_OPS.index('compile_pieline'):
+    if args.op == 'compile_pieline':  # this op requests a new uuid
         kfp.compiler.Compiler().compile(
             {{ make_pipeline_function_name(pipeline.pipelineName) }},
             pipeline_file_path
         )
 
-    if op_num >= ARG_OPS.index('create_bucket'):
+    if op_num == 'create_bucket':
         S3Utils.create_bucket(BUCKET_NAME_VAR)
 
     exp_obj = None
-    if op_num >= ARG_OPS.index('prepare_env'):
-        setup_storage_pipeline_dependencies()
+    if op_num == 'prepare_env':
+        setup_storage_pipeline_dependencies([
+            {% for file in pipeline.dependencies %}
+                file
+            {% endfor %}
+        ])
         exp_obj = client.create_experiment(
             name="{{pipeline.pipelineName}}",
             description="{{pipeline.description}}"
         )
-        print(f"Bucket Path: '{BUCKET_PATH_}'")
+        print(f"Bucket Path: '{bucket_path}'")
 
-    if op_num >= ARG_OPS.index('create_run'):
+    if op_num == 'create_run':
         client.create_run_from_pipeline_package(
-            experiment_name=BUCKET_PATH_,
+            experiment_name=bucket_path,
             pipeline_file=pipeline_file_path,
             arguments={},  # TEMPORARY
         )
 
-    elif op_num >= ARG_OPS.index('create_recurring_run'):
+    elif op_num == 'create_recurring_run':
         # THIS IS DANGEROUS -> COMMENTED OUT AS OF NOW
-        # client.create_recurring_run(
-        #     experiment_id=exp_obj.id,
-        #     cron_expression="{{pipeline.defaultParams.cronExpression}}",
-        #     max_concurrency=int({{pipeline.defaultParams.max_concurrency}}),
-        #     pipeline_package_path=pipeline_file_path
-        # )
-        pass
+        client.create_recurring_run(
+            experiment_id=exp_obj.id,
+            cron_expression={{string_or_none(pipeline.defaultParams.cronExpression)}},
+            max_concurrency=int({{pipeline.defaultParams.max_concurrency}}),
+            pipeline_package_path=pipeline_file_path
+        )

@@ -7,13 +7,10 @@ nao sei como faz pra chamr o marvin de diferentes repositorios
 import os
 import shutil
 import json
-from uuid import uuid4 as uuid_gen
 
 import click
 import yaml
 
-from renderer import Renderer
-from parser import Parser
 from utils import Utils, BColors
 from marvin import Marvin
 
@@ -48,20 +45,12 @@ def cli(verbose):
 def init(project_dir, verbose, template, name):
     '''
     # TODO: substituir pelo cookiecutter (e ver cmo funciona -> n to achando)
+    # TODO: passar isso aqui pra Marvin Class
     '''
     project_name = Utils.clean_dirname(name)
-    template_src = os.path.join(USR_TEMPLATES_DIR, template)
 
-    if template == 'clean':
-
-        Utils.copy_dir_from_template(template_src, project_dir)
-
-        name_line = ''
-        with open(os.path.join(project_dir, '.marvin'), 'r', encoding='UTF-8') as f:
-            name_line = f.read().format(project_name)
-
-        with open(os.path.join(project_dir, '.marvin'), 'w', encoding='UTF-8') as f:
-            f.write(name_line)
+    m = Marvin()
+    m.init_project(template, project_name)
 
 
 @cli.command()

@@ -4,6 +4,7 @@ General Utils for other modules.
 
 import os
 import shutil
+import re
 
 import click
 
@@ -85,3 +86,10 @@ class Utils:
             dirname = dirname.replace(char, '-')
 
         return dirname
+
+    @staticmethod
+    def format_one(string, arg):
+        '''
+        Equivalent of String.format(), but it will only format the first "{}" found.
+        '''
+        return re.sub('\{.*?\}', arg, string, count=1)  # noqa: W1401, W605 # pylint: disable=W1401
