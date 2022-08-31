@@ -7,8 +7,8 @@ from datetime import datetime
 import kfp
 from kfp import dsl
 
-from container_wrapper import ContainerWrapper as Container
-from s3_utils import S3Utils
+from marvin.container_wrapper import ContainerWrapper as Container
+from marvin.s3_utils import S3Utils
 
 
 ARG_OPS = [
@@ -16,7 +16,8 @@ ARG_OPS = [
     'create_bucket',
     'prepare_env',
     'upload_pipeline',
-    'generate_run'
+    'create_run',
+    'create_recurring_run',
 ]
 
 ARGS_OPS_ENUM_DICT = {
@@ -24,7 +25,8 @@ ARGS_OPS_ENUM_DICT = {
     'create_bucket': 1,
     'prepare_env': 2,  # upload files to storage[0]
     'upload_pipeline': 3,
-    'generate_run': 4,
+    'create_run': 4,
+    'create_recurring_run': 5,
 }
 
 
@@ -163,9 +165,9 @@ if __name__ == '__main__':
     {# # CERTO
     pipeline_file_path = 'pipelines.yaml' # extract it from your database
     pipeline_name = 'Your Pipeline Name'
+    #}
 
-    client = kfp.Client()
-    pipeline = client.pipeline_uploads.upload_pipeline(pipeline_file_path, name=pipeline_name) #}
+    client = kfp.Client(host="{{pipeline.defaultParams.envVars.KFP_ENDPOINT}}")
 
     # OPERATIONS::
     op_num = ARGS_OPS_ENUM_DICT[args.op]
@@ -179,12 +181,27 @@ if __name__ == '__main__':
     if op_num >= ARG_OPS.index('create_bucket'):
         S3Utils.create_bucket(BUCKET_NAME_VAR)
 
+    exp_obj = None
     if op_num >= ARG_OPS.index('prepare_env'):
         setup_storage_pipeline_dependencies()
+        exp_obj = client.create_experiment(
+            name="{{pipeline.pipelineName}}",
+            description="{{pipeline.description}}"
+        )
         print(f"Bucket Path: '{BUCKET_PATH_}'")
 
-    if op_num >= ARG_OPS.index('upload_pipeline'):  # not yet supported
-        pass
+    if op_num >= ARG_OPS.index('create_run'):
+        client.create_run_from_pipeline_package(
+            experiment_name=BUCKET_PATH_,
+            pipeline_file=pipeline_file_path
+            arguments={},  # TEMPORARY
+        )
 
-    if op_num >= ARG_OPS.index('generate_run'):  # Not yet supported
-        pass
+    elif op_num >= ARG_OPS.index('create_recurring_run'):
+        # THIS IS DANGEROUS -> COMMENTED OUT AS OF NOW
+        # client.create_recurring_run(
+        #     experiment_id=exp_obj.id,
+        #     cron_expression="{{pipeline.defaultParams.cronExpression}}",
+        #     max_concurrency=int({{pipeline.defaultParams.max_concurrency}}),
+        #     pipeline_package_path=pipeline_file_path
+        # )

@@ -5,12 +5,16 @@ defaultParams:
     storageBucket: housing_prices
     setupCommand: pip install -r requirements.txt
     envVars:
+        # KFP CONFIG:
+        - KFP_ENDPOINT: kfp_uri
+        # - KFP_CLIENT_ID: pegar computer name?
+        # CLOUD STORAGE CONFIG:
         - S3_ACCESS_KEY: minio_key
-        - S3_SECRET_KEY: $MINIO_SECRET_KEY # Since this key starts with '$', it will be fetched from 'envFile'
+        - S3_SECRET_KEY: $MINIO_SECRET_KEY  # Since this key starts with '$', it will be fetched from 'envFile'
         - S3_ENDPOINT: minio_uri
     dependencies:
         # TODO: Colocar essa parada do local no json
-        - requirements.txt: local # default is local ~> means 'setup_kfp' command will upload FROM LOCAL MACHINE
+        - requirements.txt: local  # default is local ~> means 'setup_kfp' command will upload FROM LOCAL MACHINE
         - test.csv
         - train.csv
         - acquisitor.py
@@ -21,6 +25,10 @@ defaultParams:
         - requirements.txt
     envFile:
         .env
+    # Run parameters:
+    cronExpression: 0-59/2 * * * *  # “At every 2nd minute from 0 through 59.”
+    max_concurrency: 2
+    no_catchup: true
 
 pipelineSteps:
     - name: acquisitor
