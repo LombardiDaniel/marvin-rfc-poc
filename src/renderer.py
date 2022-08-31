@@ -44,30 +44,6 @@ class Renderer:
         self.parsed_yaml = parsed_yaml
         self.parsed_yaml['uuid'] = uuid_str
 
-    @staticmethod
-    def make_step_function_name(step_name):
-        '''
-        Helper function to generate the step funcion name to be used in the
-        rendered file.
-        '''
-        return step_name + Renderer.STEP_FUNCTION_SUFFIX
-
-    @staticmethod
-    def make_step_function_pointer_name(step_name):
-        '''
-        Helper function to generate the step funcion pointer name to be used in
-        the rendered file.
-        '''
-        return step_name + Renderer.STEP_FUNCTION_POINTER_SUFFIX
-
-    @staticmethod
-    def make_pipeline_function_name(pipeline_name):
-        '''
-        Helper function to generate the pipeline funcion name to be used in the
-        rendered file.
-        '''
-        return pipeline_name + Renderer.PIPELINE_FUNCTION_SUFFIX
-
     def render(self, target_path=None, auto_format=True):
         '''
         Renders the pipeline file. It also containes the needed files for
@@ -88,19 +64,11 @@ class Renderer:
         env.globals['make_pipeline_function_name'] = Renderer.make_pipeline_function_name
         env.globals['make_step_function_pointer_name'] = Renderer.make_step_function_pointer_name
         env.globals['make_step_function_name'] = Renderer.make_step_function_name
-
-        # TODO: criar um outro arquivo que importa o q a gnt fez e ele sobe os arquivos pro minio
-        # template_file = ''
-        # with open('templates/pipeline.py.j2', 'r', encoding='UTF-8') as file:
-        #     template_file = file.read()
+        env.globals['string_or_none'] = Renderer.string_or_none
 
         # pipeline_template = Template(template_file)
         pipeline_template = env.get_template("pipeline.py.j2")
-        rendered_pipeline = pipeline_template.render(
-            pipeline=self.parsed_yaml,
-            upload=False  # isso vai ser removido do renderer
-            # TODO: remover isso e pensar direito como separar
-        )
+        rendered_pipeline = pipeline_template.render(pipeline=self.parsed_yaml,)
 
         if auto_format:
             rendered_pipeline = black.format_str(
@@ -114,10 +82,49 @@ class Renderer:
 
         return rendered_pipeline
 
+    @staticmethod
+    def make_step_function_name(step_name):
+        '''
+        Helper function to generate the step funcion name to be used in the
+        rendered file.
+        '''
+        return step_name + Renderer.STEP_FUNCTION_SUFFIX
+
+    @staticmethod
+    def make_step_function_pointer_name(step_name):
+        '''
+        Helper function to generate the step funcion pointer name to be used in
+        the rendered file.
+        '''
+        return step_name + Renderer.STEP_FUNCTION_POINTER_SUFFIX
+
+    @staticmethod
+    def string_or_none(var):
+        '''
+        Helper function to allow passtrhough of extra/optional parameters for
+        kfp run creations. More info on:
+            https://kubeflow-pipelines.readthedocs.io/en/latest/source/kfp.client.html#create_run_from_pipeline_package
+
+        Returns either None or str(var).
+        '''
+
+        if var in ['None', 'none', 'NONE', None]:
+            return None
+
+        return f'"{str(var)}"'
+
+    @staticmethod
+    def make_pipeline_function_name(pipeline_name):
+        '''
+        Helper function to generate the pipeline funcion name to be used in the
+        rendered file.
+        '''
+        return pipeline_name + Renderer.PIPELINE_FUNCTION_SUFFIX
+
 
 # TODO: remover isso aqui e criar arquivo de test
 if __name__ == '__main__':
-    import yaml
+    import json
     import uuid
 
     d = {}
