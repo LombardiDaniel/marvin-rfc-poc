@@ -68,7 +68,7 @@ class Marvin(MarvinBase):
         Compiles using the subprocess module.
         '''
 
-        final_command = f'{self.python3_path} {self.pipeline_py} compile_pieline -h "{self.uuid}"'
+        final_command = f'{self.python3_path} {self.pipeline_py} compile_pipeline -h "{self.uuid}"'
 
         try:
             subprocess.run(

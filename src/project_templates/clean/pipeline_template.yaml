@@ -1,7 +1,9 @@
+APIVersion: 0.1-beta
 pipelineName: pipeline_housing_prices
 description: Pipeline for presentation of famous housing_prices problem
 
 defaultParams:
+    pipelineExecutor: KFP
     storageBucket: housing_prices
     setupCommand: pip install -r requirements.txt
     envVars:
@@ -25,11 +27,12 @@ defaultParams:
     envFile:
         .env
     # Run parameters:
-    cronExpression: 0-59/2 * * * *  # “At every 2nd minute from 0 through 59.”
-    max_concurrency: 2
-    no_catchup: true
-    # gettings parameters from:
-    # https://kubeflow-pipelines.readthedocs.io/en/latest/source/kfp.client.html
+    runParameters:
+        cronExpression: 0-59/2 * * * *  # “At every 2nd minute from 0 through 59.”
+        max_concurrency: 2
+        no_catchup: true
+        # gettings parameters from:
+        # https://kubeflow-pipelines.readthedocs.io/en/latest/source/kfp.client.html
 
 pipelineSteps:
     - name: acquisitor

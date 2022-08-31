@@ -1,5 +1,6 @@
 '''
-Jinja template for pipeline creation.
+{# Jinja template for pipeline creation. #}
+{{pipeline.description}}
 '''
 import argparse
 from datetime import datetime
@@ -12,7 +13,7 @@ from marvin.s3_utils import S3Utils
 
 
 ARG_OPS = [
-    'compile_pieline',
+    'compile_pipeline',
     'create_bucket',
     'prepare_env',
     'upload_pipeline',
@@ -21,7 +22,7 @@ ARG_OPS = [
 ]
 
 ARGS_OPS_ENUM_DICT = {
-    'compile_pieline': 0,
+    'compile_pipeline': 0,
     'create_bucket': 1,
     'prepare_env': 2,  # upload files to storage[0]
     'upload_pipeline': 3,
@@ -193,7 +194,7 @@ if __name__ == '__main__':
     if op_num >= ARG_OPS.index('create_run'):
         client.create_run_from_pipeline_package(
             experiment_name=BUCKET_PATH_,
-            pipeline_file=pipeline_file_path
+            pipeline_file=pipeline_file_path,
             arguments={},  # TEMPORARY
         )
 
@@ -205,3 +206,4 @@ if __name__ == '__main__':
         #     max_concurrency=int({{pipeline.defaultParams.max_concurrency}}),
         #     pipeline_package_path=pipeline_file_path
         # )
+        pass

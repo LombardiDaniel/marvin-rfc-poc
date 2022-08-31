@@ -225,6 +225,8 @@ if __name__ == "__main__":
 
     pipeline_file_path = f"{PROJECT_NAME}.yaml"
 
+    client = kfp.Client(endpoint='http://my.kfp.endpoint.io')
+
     # OPERATIONS::
     op_num = ARGS_OPS_ENUM_DICT[args.op]
 
