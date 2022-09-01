@@ -11,10 +11,10 @@ from uuid import uuid4
 import click
 import yaml
 
-from marvin_base import MarvinBase, MarvinDefaults
-from renderer import Renderer
+from marvin.dsl.marvin_base import MarvinBase, MarvinDefaults
+from marvin.dsl.renderer import Renderer
 from parser import Parser
-from utils import Utils
+from marvin.utils.utils import Utils
 
 
 MARVIN_PATH = os.getenv('MARVIN_PATH', '~/usr/bin/marvin')

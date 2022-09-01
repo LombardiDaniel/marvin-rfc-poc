@@ -8,8 +8,8 @@ from datetime import datetime
 import kfp
 from kfp import dsl
 
-from container_wrapper import ContainerWrapper as Container
-from s3_utils import S3Utils
+from marvin.dsl.container_wrapper import ContainerWrapper as Container
+from marvin.utils.s3_utils import S3Utils
 
 
 # - Variables for user project - #
