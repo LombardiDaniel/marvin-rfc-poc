@@ -1,5 +1,4 @@
 '''
-nao sei como faz pra chamr o marvin de diferentes repositorios
 '''
 
 import os
@@ -37,7 +36,7 @@ class Marvin(MarvinBase):
         # self.uuid = uuid4() if uuid is None else uuid
         self.pipeline_py = None
 
-    def init_project(self, template, project_name):
+    def init_project(self, template, project_name, force_overwrite):
         '''
         Initializes the project, will use cookiecutter in the future, as of now
         simply copies the '.marvin' file into the project dir and populates base
@@ -45,12 +44,14 @@ class Marvin(MarvinBase):
         '''
         template_src = os.path.join(USR_TEMPLATES_DIR, template)
 
-        if template not in [item for item in os.listdir(USR_TEMPLATES_DIR) if os.path.isdir(item)]:
+        # lst = [item for item in os.listdir(USR_TEMPLATES_DIR) if os.path.isdir(item)]
+
+        if template not in os.listdir(USR_TEMPLATES_DIR):
             raise MarvinTemplateNotFoundError(
                 f'Template "{template}" not in "{USR_TEMPLATES_DIR}".'
             )
 
-        Utils.copy_dir_from_template(template_src, self.project_dir)
+        Utils.copy_dir_from_template(template_src, self.project_dir, force_overwrite)
 
         self.setup_marvin_base_file(project_name)
 
@@ -78,10 +79,10 @@ class Marvin(MarvinBase):
 
         p = Parser(project_path=self.project_dir, user_defined_yaml=usr_pipeline)
 
-        # dumps the dict content in a json file in tmp_folder
         try:
             r = Renderer(p.dict, str(self.uuid))
         except Exception as exp:  # pylint: disable=W0703
+            # dumps the dict content in a json file in tmp_folder
             dump_contents = p.yaml
             dump_path = os.path.join(self.logs_dir, f'usr_yaml.{self.uuid}.json')
             with open(dump_path, 'w', encoding='UTF-8') as file:
@@ -114,6 +115,73 @@ class Marvin(MarvinBase):
             )
         except subprocess.CalledProcessError as exp:
             click.prompt(f'{exp}::Error in Compiling pipeline: "{self.pipeline_py}"')
+
+    def create_bucket(self, verbose, debug, *args, **kwargs):
+        '''
+        Compiles using the subprocess module.
+        '''
+
+        final_command = f'{self.python3_path} {self.pipeline_py} create_bucket -h "{self.uuid}"'
+
+        try:
+            subprocess.run(
+                ['/bin/sh', '-c', final_command],
+                check=True
+            )
+        except subprocess.CalledProcessError as exp:
+            click.prompt(f'{exp}::Error in Creating Bucket from pipeline: "{self.pipeline_py}"')
+
+    def prepare_env(self, verbose, debug, *args, **kwargs):
+        '''
+        Compiles using the subprocess module.
+        '''
+
+        final_command = f'{self.python3_path} {self.pipeline_py} prepare_env -h "{self.uuid}"'
+
+        try:
+            subprocess.run(
+                ['/bin/sh', '-c', final_command],
+                check=True
+            )
+        except subprocess.CalledProcessError as exp:
+            click.prompt(
+                f'{exp}::Error in Preparing Environment from pipeline: "{self.pipeline_py}"'
+            )
+
+    def create_run(self, verbose, debug, *args, **kwargs):
+        '''
+        Compiles using the subprocess module.
+        '''
+
+        final_command = f'{self.python3_path} {self.pipeline_py} create_run -h "{self.uuid}"'
+
+        try:
+            subprocess.run(
+                ['/bin/sh', '-c', final_command],
+                check=True
+            )
+        except subprocess.CalledProcessError as exp:
+            click.prompt(
+                f'{exp}::Error in Creating Run from pipeline: "{self.pipeline_py}"'
+            )
+
+    def create_recurring_run(self, verbose, debug, *args, **kwargs):
+        '''
+        Compiles using the subprocess module.
+        '''
+
+        final_command = f'{self.python3_path} {self.pipeline_py} create_recurring_run -h "{self.uuid}"'
+
+        try:
+            subprocess.run(
+                ['/bin/sh', '-c', final_command],
+                check=True
+            )
+        except subprocess.CalledProcessError as exp:
+            click.prompt(
+                f'{exp}::Error in Creating Recurring Run from pipeline: "{self.pipeline_py}"'
+            )
+
 
     def compile_pipeline(self, *args, **kwargs):
         '''

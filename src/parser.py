@@ -89,7 +89,7 @@ class Parser(MarvinBase):
                 # we replace the env var in the yaml from the one present in the env_file
                 for file_env_var in env_vars_from_file:
                     if file_env_var['key'] == env_var_name_in_file:
-                        print(ctx['envVars'][i])
+                        # print(ctx['envVars'][i])
                         ctx['envVars'][i]['value'] = file_env_var['value']
 
         return ctx
@@ -124,6 +124,13 @@ class Parser(MarvinBase):
             self.yaml['defaultParams']['envVars'][i] = Utils.fix_key_values(
                 item
             )
+
+        keys = ['runParams', 'recurringRunParams']
+        for key in keys:
+            for i, item in enumerate(self.yaml['defaultParams'][key]):
+                self.yaml['defaultParams'][key][i] = Utils.fix_key_values(
+                    self.yaml['defaultParams'][key][i]
+                )
 
         # Fix pipelineSteps envVars
         for i, step in enumerate(self.yaml['pipelineSteps']):

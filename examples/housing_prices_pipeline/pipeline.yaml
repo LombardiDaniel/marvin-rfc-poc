@@ -25,12 +25,14 @@ defaultParams:
         - requirements.txt
     envFile:
         .env
-    # Run parameters:
-    cronExpression: 0-59/2 * * * *  # “At every 2nd minute from 0 through 59.”
-    max_concurrency: 2
-    no_catchup: true
     # gettings parameters from:
     # https://kubeflow-pipelines.readthedocs.io/en/latest/source/kfp.client.html
+    runParams:
+        - enable_caching: true
+    recurringRunParams:
+        - cronExpression: 0-59/2 * * * *  # “At every 2nd minute from 0 through 59.”
+        - max_concurrency: 2
+        - no_catchup: true
 
 pipelineSteps:
     - name: acquisitor

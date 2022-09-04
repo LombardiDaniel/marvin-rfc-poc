@@ -3,9 +3,11 @@ Renderer Class, to be used by the MARVIN.ai CLI.
 '''
 
 import os
+import sys
 
 from jinja2 import Environment, FileSystemLoader
 import black
+import click
 
 # from s3_utils import S3Utils
 
@@ -64,17 +66,29 @@ class Renderer:
         env.globals['make_pipeline_function_name'] = Renderer.make_pipeline_function_name
         env.globals['make_step_function_pointer_name'] = Renderer.make_step_function_pointer_name
         env.globals['make_step_function_name'] = Renderer.make_step_function_name
-        env.globals['string_or_none'] = Renderer.string_or_none
+        env.globals['string_or_var'] = Renderer.string_or_var
 
         # pipeline_template = Template(template_file)
         pipeline_template = env.get_template("pipeline.py.j2")
-        rendered_pipeline = pipeline_template.render(pipeline=self.parsed_yaml,)
+        rendered_pipeline = pipeline_template.render(
+            pipeline=self.parsed_yaml,
+            target_path=target_path
+        )
 
         if auto_format:
             rendered_pipeline = black.format_str(
                 rendered_pipeline,
                 mode=black.FileMode(line_length=82)
             )
+            # try:
+            #     rendered_pipeline = black.format_str(
+            #         rendered_pipeline,
+            #         mode=black.FileMode(line_length=82)
+            #     )
+            # except Exception:
+            #     exc_type, exc_obj, exc_tb = sys.exc_info()
+            #     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            #     click.prompt(exc_type, fname, exc_tb.tb_lineno)
 
         if target_path is not None:
             with open(target_path, 'w', encoding='UTF-8') as file:
@@ -99,7 +113,7 @@ class Renderer:
         return step_name + Renderer.STEP_FUNCTION_POINTER_SUFFIX
 
     @staticmethod
-    def string_or_none(var):
+    def string_or_var(var):
         '''
         Helper function to allow passtrhough of extra/optional parameters for
         kfp run creations. More info on:
@@ -108,8 +122,8 @@ class Renderer:
         Returns either None or str(var).
         '''
 
-        if var in ['None', 'none', 'NONE', None]:
-            return None
+        if not isinstance(var, str):
+            return var
 
         return f'"{str(var)}"'
 

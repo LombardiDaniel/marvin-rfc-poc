@@ -223,8 +223,5 @@ if __name__ == "__main__":
     if op_num >= ARG_OPS.index('prepare_env'):
         setup_storage_pipeline_dependencies()
 
-    if op_num >= ARG_OPS.index('upload_pipeline'):
-        S3Utils.create_bucket(BUCKET_NAME_VAR)
-
     if op_num >= ARG_OPS.index('generate_run'):  # Not yet supported
         S3Utils.create_bucket(BUCKET_NAME_VAR)

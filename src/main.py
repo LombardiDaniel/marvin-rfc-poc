@@ -42,15 +42,16 @@ def cli(verbose):
     '--name',
     default=lambda: os.path.basename(os.getcwd())
 )
-def init(project_dir, verbose, template, name):
+@click.option('-f', '--force-overwrite', is_flag=True, default=False)
+def init(project_dir, verbose, template, name, force_overwrite):
     '''
     # TODO: substituir pelo cookiecutter (e ver cmo funciona -> n to achando)
     # TODO: passar isso aqui pra Marvin Class
     '''
     project_name = Utils.clean_dirname(name)
 
-    m = Marvin()
-    m.init_project(template, project_name)
+    m = Marvin(project_dir=project_dir)
+    m.init_project(template, project_name, force_overwrite)
 
 
 @cli.command()
@@ -70,10 +71,96 @@ def compile(pipeline_file, verbose, debug):
     m.compile_pipeline(pipeline_file, verbose, debug)
 
 
+@cli.command()
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def incremental_create_bucket(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = Marvin()
+    m.create_bucket(pipeline_file, verbose, debug)
+
+
+@cli.command()
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def incremental_prepare_env(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = Marvin()
+    m.prepare_env(pipeline_file, verbose, debug)
+
+
+@cli.command()
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def incremental_crete_run(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = Marvin()
+    m.create_run(pipeline_file, verbose, debug)
+
+
+@cli.command()
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def incremental_crete_recurring_run(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = Marvin()
+    m.create_recurring_run(pipeline_file, verbose, debug)
+
+
+@cli.command()
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def compile_and_run(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = Marvin()
+    m.compile_pipeline(pipeline_file, verbose, debug)
+    m.create_bucket(pipeline_file, verbose, debug)
+    m.prepare_env(pipeline_file, verbose, debug)
+    m.create_run(pipeline_file, verbose, debug)
+
+
+
 if __name__ == '__main__':
-
-    # cli.add_command(init)
-
     cli()  # pylint: disable=E1120
 
     # tmp:

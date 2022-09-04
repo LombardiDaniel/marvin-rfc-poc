@@ -45,6 +45,9 @@ class Utils:
                 }
         '''
 
+        if not isinstance(k_v_dict, dict):
+            return
+
         for k, v in k_v_dict.items():
             return {
                 'key': k,
@@ -52,7 +55,7 @@ class Utils:
             }
 
     @staticmethod
-    def copy_dir_from_template(src: str, dst: str, prompt_overwrite=True):
+    def copy_dir_from_template(src: str, dst: str, force_overwrite=False):
         '''
         equivalent of:
             `cp $SRC/* $DST`
@@ -63,13 +66,16 @@ class Utils:
             source = os.path.join(src, file_name)
             destination = os.path.join(dst, file_name)
 
-            if os.path.exists(destination) and prompt_overwrite:
-                answ = click.prompt(
-                    f'"{BColors.WARNING}{destination}{BColors.ENDC}" already exists, overwrite? (y/n)',  # noqa: E501 # pylint: disable=C0301
-                    type=str
+            if os.path.exists(destination) and not force_overwrite:
+                # answ = click.prompt(
+                #     f'"{BColors.WARNING}{destination}{BColors.ENDC}" already exists, overwrite? (y/n)',  # noqa: E501 # pylint: disable=C0301
+                #     type=str
+                # )
+                answ_y = click.confirm(
+                    f'"{BColors.WARNING}{destination}{BColors.ENDC}" already exists, overwrite?',
                 )
 
-                if answ != 'y':
+                if not answ_y:
                     continue
 
             shutil.copy(source, destination)

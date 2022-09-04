@@ -38,10 +38,14 @@ class MarvinBase:  # pylint: disable=R0903
     def uuid(self, new_uuid):
         '''
         '''
+
+        curr_dict = self._get_marvin_dict()
+        curr_dict.update({
+            'LAST_UUID': new_uuid
+        })
+
         self._set_marvin_dict(
-            self._get_marvin_dict().update({
-                'LAST_UUID': new_uuid
-            })
+            curr_dict
         )
 
     def __init__(self, *args, project_dir=os.getcwd(), **kwargs):  # pylint: disable=W0613
@@ -64,10 +68,14 @@ class MarvinBase:  # pylint: disable=R0903
         '''
         '''
 
+        n_d = self._get_marvin_dict()
+
+        n_d.update({
+            'PROJECT_NAME': Utils.clean_dirname(project_name)
+        })
+
         self._set_marvin_dict(
-            self._get_marvin_dict().update({
-                'PROJECT_NAME': Utils.clean_dirname(project_name)
-            })
+            new_dict=n_d
         )
 
     def _get_marvin_dict(self):
@@ -77,8 +85,7 @@ class MarvinBase:  # pylint: disable=R0903
         marvin_dict = {}
         with open(os.path.join(self.project_dir, '.marvin'), 'r', encoding='UTF-8') as f:
             for line in f.readlines():
-
-                k, v = line.splitlines().split('=', maxsplit=1)
+                k, v = line.splitlines()[0].split('=', maxsplit=1)
                 marvin_dict[k] = v
 
         return marvin_dict
@@ -86,6 +93,9 @@ class MarvinBase:  # pylint: disable=R0903
     def _set_marvin_dict(self, new_dict):
         '''
         '''
+
+        # if new_dict is None:
+        #     new_dict = {}
 
         contents = ''
         for k, v in new_dict.items():
