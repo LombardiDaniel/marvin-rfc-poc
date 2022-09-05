@@ -1,11 +1,9 @@
-'''
-Renderer Class, to be used by the MARVIN.ai CLI.
-'''
-
 import os
+from textwrap import indent
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Template
 import black
+import json
 
 # from s3_utils import S3Utils
 
@@ -34,7 +32,7 @@ class Renderer:
         - make_pipeline_function_name() : Helper function for renderer function naming.
     '''
 
-    TEMPLATES_DIR = f'{os.path.dirname(os.path.realpath(__file__))}/templates'
+    TEMPLATES_DIR = f'{os.getcwd()}/../templates/lang'
 
     STEP_FUNCTION_SUFFIX = '_step_func'
     STEP_FUNCTION_POINTER_SUFFIX = '_step_pointer_func'
@@ -83,24 +81,30 @@ class Renderer:
                 file.
         '''
 
-        env = Environment(loader=FileSystemLoader(Renderer.TEMPLATES_DIR))
-        # helper functions:
-        env.globals['make_pipeline_function_name'] = Renderer.make_pipeline_function_name
-        env.globals['make_step_function_pointer_name'] = Renderer.make_step_function_pointer_name
-        env.globals['make_step_function_name'] = Renderer.make_step_function_name
-
         # TODO: criar um outro arquivo que importa o q a gnt fez e ele sobe os arquivos pro minio
         # template_file = ''
         # with open('templates/pipeline.py.j2', 'r', encoding='UTF-8') as file:
         #     template_file = file.read()
 
         # pipeline_template = Template(template_file)
-        pipeline_template = env.get_template("pipeline.py.j2")
-        rendered_pipeline = pipeline_template.render(
-            pipeline=self.parsed_yaml,
-            upload=False  # isso vai ser removido do renderer
-            # TODO: remover isso e pensar direito como separar
+        pipeline_template = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "templates/lang/pipeline.py.j2"
         )
+        with open(pipeline_template, 'r') as f:
+            template = Template(f.read())
+        template.globals['make_pipeline_function_name'] = Renderer.make_pipeline_function_name
+        template.globals['make_step_function_pointer_name'] = Renderer.make_step_function_pointer_name
+        template.globals['make_step_function_name'] = Renderer.make_step_function_name
+
+        with open('output.yaml', 'w') as f:
+            f.write(json.dumps(self.parsed_yaml, indent=4))
+
+        print(self.parsed_yaml['defaultParams']['envVars'])
+        rendered_pipeline = template.render(pipeline=self.parsed_yaml)
+
+        with open('output.py', 'w') as f:
+            f.write(rendered_pipeline)
 
         if auto_format:
             rendered_pipeline = black.format_str(
@@ -113,17 +117,3 @@ class Renderer:
                 file.write(rendered_pipeline)
 
         return rendered_pipeline
-
-
-# TODO: remover isso aqui e criar arquivo de test
-if __name__ == '__main__':
-    import yaml
-    import uuid
-
-    d = {}
-    with open('../examples/housing_prices_pipeline/pipeline.json', 'r', encoding='UTF=8') as f:
-        d = json.load(f)
-
-    r = Renderer(d, uuid.uuid4())
-
-    r.render('rendered_file.py', )

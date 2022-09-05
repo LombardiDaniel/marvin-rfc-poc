@@ -4,11 +4,10 @@ Parser to generate JSON/dict from user defined YAML.
 
 import os
 
-from marvin.dsl.marvin_base import MarvinBase, MarvinDefaults
 from marvin.utils.utils import Utils
 
 
-class Parser(MarvinBase):
+class Parser():
     '''
     Parser class is responsible to transform the user defined pipeline.yaml file
     into the expected json (in-memory dict obj) to be forwarded to the renderer.
@@ -39,7 +38,7 @@ class Parser(MarvinBase):
 
         self.fix_all_key_values()
 
-        self.insert_env_file_in_pipe()
+        #self.insert_env_file_in_pipe()
 
     def check_yaml(self):
         '''
@@ -80,11 +79,9 @@ class Parser(MarvinBase):
                 'value': block[1]
             })
 
-        defaults = MarvinDefaults(self.project_path)
-
         for i, env_var in enumerate(ctx['envVars']):
-            if env_var['value'].startswith(defaults.envVarFromEnvFilePrefix):  # pylint: disable=E1101
-                env_var_name_in_file = env_var['value'].split(defaults.envVarFromEnvFilePrefix, maxsplit=1)[-1]  # noqa: E501 # pylint: disable=E1101, C0301
+            if env_var['value'].startswith('$'):  # pylint: disable=E1101
+                env_var_name_in_file = env_var['value'].split('$', maxsplit=1)[-1]  # noqa: E501 # pylint: disable=E1101, C0301
 
                 # we replace the env var in the yaml from the one present in the env_file
                 for file_env_var in env_vars_from_file:
@@ -104,13 +101,11 @@ class Parser(MarvinBase):
             }
         '''
 
-        prj_defaults = MarvinDefaults(self.project_path)
-
         # Fix dependencies
         for i, file_name in enumerate(self.yaml['defaultParams']['dependencies']):
             if isinstance(file_name, str):  # first we set defaults to local
                 self.yaml['defaultParams']['dependencies'][i] = {
-                    file_name: prj_defaults.pipelineFileDependencies  # pylint: disable=E1101
+                    file_name: '/tmp/marvin/pipeline.py'  # pylint: disable=E1101
                 }
 
         # then we fix the vars
@@ -132,17 +127,3 @@ class Parser(MarvinBase):
                     self.yaml['pipelineSteps'][i]['envVars'][j] = Utils.fix_key_values(
                         item
                     )
-
-
-if __name__ == '__main__':
-    import yaml
-    import json
-
-    y = {}
-    with open('../examples/housing_prices_pipeline/pipeline.yaml', 'r', encoding='UTF-8') as file:
-        y = yaml.load(file, Loader=yaml.FullLoader)
-
-    p = Parser(project_path='.', user_defined_yaml=y)
-
-    with open('test.json', 'w', encoding='UTF-8') as f:
-        f.write(json.dumps(p.dict))

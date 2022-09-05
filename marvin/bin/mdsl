@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+import yaml
+from marvin.dsl.parser import Parser
+from marvin.dsl.renderer import Renderer
+
+if __name__ == "__main__":
+    with open('pipeline.yaml') as f:
+        yaml_s = yaml.safe_load(f.read())
+        p = Parser(user_defined_yaml=yaml_s)
+        r = Renderer(p.yaml, 'untitled')
+        r.parsed_yaml
+        r.render('pipe.py')

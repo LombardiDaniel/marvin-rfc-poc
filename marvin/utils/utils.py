@@ -1,7 +1,3 @@
-'''
-General Utils for other modules.
-'''
-
 import os
 import shutil
 

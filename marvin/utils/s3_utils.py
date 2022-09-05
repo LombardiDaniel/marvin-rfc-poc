@@ -187,30 +187,3 @@ class S3Utils:
 
         match_ex = '(?!(^xn--|-s3alias$))^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$'
         return not re.search(match_ex, bucket_name)
-
-
-if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('op', type=str, choices=['download', 'upload'], help='Operation')
-    parser.add_argument('items', nargs='*', default=[], help='Items list')
-    parser.add_argument('-v', '--verbose', action='store_true')
-    args = parser.parse_args()
-
-    # print(args.verbose)
-    # print(args.op)
-    # print(args.items)
-
-    minio = S3Utils(
-        os.getenv('S3_ENDPOINT'),
-        os.getenv('S3_ACCESS_KEY'),
-        os.getenv('S3_SECRET_KEY'),
-        bucket_name=os.getenv('BUCKET_NAME'),
-        bucket_path=os.getenv('BUCKET_PATH'),
-    )
-
-    if args.op == 'download':
-        minio.download(args.items, verbose=args.verbose)
-
-    elif args.op == 'upload':
-        minio.upload(args.items, verbose=args.verbose)

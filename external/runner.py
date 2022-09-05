@@ -1,22 +1,3 @@
-'''
-Utilizacao:
-
-python s3_utils.py [OPERATION] [ITEMS] -v (optional)
-
-OPERATION : download | upload
-ITEMS : list of paths to files seperated by space (' '), for both download and upload
--v : Verbose
-
-Exemplo pra download:
-
-python s3_utils.py download item1.py pastaDoMinio/item2.py texto.txt
-
-
-Exemplo para upload:
-
-python s3_utils.py upload ./item1.py minhaPasta/item2.py texto.txt
-'''
-
 import re
 import secrets
 import os
@@ -156,7 +137,7 @@ class S3Utils:
             client.make_bucket(self.bucket_name)
 
         else:
-            print(f'Bucket "{self.bucket_name}" already existst.')
+            print(f'Bucket "{self.bucket_name}" already exists.')
 
         return self.bucket_name
 

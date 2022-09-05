@@ -1,7 +1,3 @@
-'''
-nao sei como faz pra chamr o marvin de diferentes repositorios
-'''
-
 import os
 import shutil
 import json
@@ -11,43 +7,18 @@ from uuid import uuid4
 import click
 import yaml
 
-from marvin.dsl.marvin_base import MarvinBase, MarvinDefaults
 from marvin.dsl.renderer import Renderer
 from parser import Parser
 from marvin.utils.utils import Utils
 
-
-MARVIN_PATH = os.getenv('MARVIN_PATH', '~/usr/bin/marvin')
-USR_TEMPLATES_DIR = os.path.join(MARVIN_PATH, 'project_templates')
-MARVIN_TEMPLATE_OPTIONS = os.listdir(USR_TEMPLATES_DIR)
-
-
-class Marvin(MarvinBase):
-    '''
-    Abstraction/Class to be used by the CLI
-
-    Attributes:
-    '''
-
+class Compiler():
     def __init__(self, *args, uuid=None, **kwargs):
         super().__init__(self, *args, **kwargs)
 
-        self.default = MarvinDefaults()
         self.uuid = uuid4() if uuid is None else uuid
         self.pipeline_py = None
 
-    def _render_pipeline(self, usr_yaml, verbose, debug, *args, **kwargs):
-        '''
-        Also sets self.pipeline_py attribute.
-        Loads and compiles the user defined pipline.
-        # NOTE: does NOT support imports atm
-
-        Args:
-            - verbose (bool) : if true will print out verbose/progress information.
-            - debug (bool) : if true will save the intermediate (compiled) python
-                file in usr project_dir.
-        '''
-
+    def render_pipeline(self, usr_yaml, verbose, debug, *args, **kwargs):
         usr_pipeline = {}
         with open(usr_yaml, 'r', encoding='UTF-8') as file:
             usr_pipeline = yaml.load(file, Loader=yaml.FullLoader)
@@ -63,11 +34,7 @@ class Marvin(MarvinBase):
             self.pipeline_py = os.path.join(self.tmp_dir, self.pipeline_py)
             r.render(target_path=self.pipeline_py)
 
-    def _compile_pipeline(self, verbose, debug, *args, **kwargs):
-        '''
-        Compiles using the subprocess module.
-        '''
-
+    def compile_and_run_pipeline(self, verbose, debug, *args, **kwargs):
         final_command = f'{self.python3_path} {self.pipeline_py} compile_pipeline -h "{self.uuid}"'
 
         try:
@@ -77,10 +44,3 @@ class Marvin(MarvinBase):
             )
         except subprocess.CalledProcessError as exp:
             click.prompt(f'{exp}::Error in Compiling pipeline: "{self.pipeline_py}"')
-
-    def compile_pipeline(self, *args, **kwargs):
-        '''
-        '''
-
-        self._render_pipeline(*args, **kwargs)
-        self._compile_pipeline(*args, **kwargs)

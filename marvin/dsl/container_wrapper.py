@@ -1,7 +1,3 @@
-'''
-Containes a wrapper for dsl.ContainerOp. This should be used instead.
-'''
-
 from kfp import dsl
 from kubernetes.client.models import V1EnvVar
 
