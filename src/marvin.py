@@ -80,6 +80,10 @@ class Marvin(MarvinBase):
         p = Parser(project_path=self.project_dir, user_defined_yaml=usr_pipeline)
 
         try:
+            # dump_contents = p.yaml
+            # dump_path = os.path.join('.', f'usr_yaml.{self.uuid}.json')
+            # with open(dump_path, 'w', encoding='UTF-8') as file:
+            #     file.write(json.dumps(dump_contents))
             r = Renderer(p.dict, str(self.uuid))
         except Exception as exp:  # pylint: disable=W0703
             # dumps the dict content in a json file in tmp_folder

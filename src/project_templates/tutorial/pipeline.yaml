@@ -19,13 +19,14 @@ defaultParams:
         - evaluate.py
     globalFiles:
         - requirements.txt
-    envFile:
-        .env
+    defaultImage: python:3.7
+    envFile: .env
 
 pipelineSteps:
     - name: acquisitor
       description: Acquisitor
       entrypoint: python acquisitor.py
+      image: python:3.7
       envVars:
         - MY_ENV_VAR: test_specific_env
       fileInputs:

@@ -14,11 +14,12 @@ class Parser(MarvinBase):
     into the expected json (in-memory dict obj) to be forwarded to the renderer.
 
     Attributes:
-        - self.json (dict) : forwards the (parsed) yaml.
-        - self.yaml (dict) : raw user defined yaml.
+        - self.dict (dict) : forwards the (parsed) yaml.
+        - self.yaml (dict) : the yaml parsed from the user.
+        - self.raw_yaml (dict) : the raw yaml specified from the user.
 
     Methods:
-        - self.check_yaml() : idk yet (# TODO: fazer esse aqui, busca erros?)
+        - self.check_yaml() : idk yet (# TODO: fazer esse aqui, busca erros?) ~> busca chaves necessárias
         - self.insert_env_file() : Checks for env files and replaces them in the
             yaml attribute.
         - self.fix_all_key_values(): Wrapper for Utils.fix_key_values() for user
@@ -35,16 +36,49 @@ class Parser(MarvinBase):
 
     def __init__(self, user_defined_yaml, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.raw_yaml = user_defined_yaml
         self.yaml = user_defined_yaml
 
         self.fix_all_key_values()
 
         self.insert_env_file_in_pipe()
+        self.spread_values_from_default()
 
     def check_yaml(self):
         '''
         checks yaml for errors?
         '''
+
+    def spread_values_from_default(self):
+        '''
+        Spreads / copies values from 'defaultParams' to 'pipelineSteps'.
+        Example: Specified docker image is copied from defaultParams to each pipeline step
+        if not already specified in pipeline step.
+        '''
+        self._spread_values('image', False)
+
+    def _spread_values(self, value_key, overwrite=False):
+        '''
+        Spreads / copies values from 'defaultParams' to 'pipelineSteps'.
+        Example: Specified docker image is copied from defaultParams to each pipeline step
+        if not already specified in pipeline step.
+
+        Args:
+            - value_key (str) : key to have its contents copied to every pipeline step
+                that does NOT have that key specified.
+        '''
+
+        if value_key == 'envVars':
+            return
+
+        default_value = None
+        for k, v in self.yaml['defaultParams'].items():
+            if k == value_key:
+                default_value = v
+
+        for i, step in enumerate(self.yaml['pipelineSteps']):
+            if value_key not in step or overwrite:
+                self.yaml['pipelineSteps'][i][value_key] = default_value
 
     def insert_env_file_in_pipe(self):
         '''

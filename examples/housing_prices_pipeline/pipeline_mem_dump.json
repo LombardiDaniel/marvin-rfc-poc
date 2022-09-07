@@ -5,109 +5,90 @@
         "storageBucket": "housing_prices",
         "setupCommand": "pip install -r requirements.txt",
         "envVars": [{
-                "key": "S3_ACCESS_KEY",
-                "value": "minio_key"
-            },
-            {
-                "key": "S3_SECRET_KEY",
-                "value": "minio_secret"
-            },
-            {
-                "key": "S3_ENDPOINT",
-                "value": "minio_uri"
-            }
-        ],
+            "key": "KFP_ENDPOINT",
+            "value": "kfp_uri"
+        }, {
+            "key": "S3_ACCESS_KEY",
+            "value": "minio_key"
+        }, {
+            "key": "S3_SECRET_KEY",
+            "value": "minhaChaveSecretaaa444aa"
+        }, {
+            "key": "S3_ENDPOINT",
+            "value": "minio_uri"
+        }],
         "dependencies": [{
-                "key": "requirements.txt",
-                "value": "local"
-            },
-            {
-                "key": "test.csv",
-                "value": "local"
-            },
-            {
-                "key": "train.csv",
-                "value": "local"
-            },
-            {
-                "key": "acquisitor.py",
-                "value": "local"
-            },
-            {
-                "key": "data_prep.py",
-                "value": "local"
-            },
-            {
-                "key": "train_model.py",
-                "value": "local"
-            },
-            {
-                "key": "evaluate.py",
-                "value": "local"
-            }
-        ],
-        "globalFiles": ["requirements.txt"]
+            "key": "requirements.txt",
+            "value": "local"
+        }, {
+            "key": "test.csv",
+            "value": "local"
+        }, {
+            "key": "train.csv",
+            "value": "local"
+        }, {
+            "key": "acquisitor.py",
+            "value": "local"
+        }, {
+            "key": "data_prep.py",
+            "value": "local"
+        }, {
+            "key": "train_model.py",
+            "value": "local"
+        }, {
+            "key": "evaluate.py",
+            "value": "local"
+        }],
+        "globalFiles": ["requirements.txt"],
+        "envFile": ".env",
+        "image": "python:3.7",
+        "runParams": [{
+            "key": "enable_caching",
+            "value": true
+        }],
+        "recurringRunParams": [{
+            "key": "cronExpression",
+            "value": "0-59/2 * * * *"
+        }, {
+            "key": "max_concurrency",
+            "value": 2
+        }, {
+            "key": "no_catchup",
+            "value": true
+        }]
     },
     "pipelineSteps": [{
-            "name": "acquisitor",
-            "description": "Acquisitor",
-            "entrypoint": "python acquisitor.py",
-            "envVars": [{
-                "key": "MY_ENV_VAR",
-                "value": "test_specific_env"
-            }],
-            "fileInputs": [
-                "test.csv",
-                "train.csv"
-            ]
-        },
-        {
-            "name": "data_prep",
-            "description": "Data preparator",
-            "runAfter": "acquisitor",
-            "entrypoint": "python data_prep.py",
-            "fileInputs": [
-                "test.csv",
-                "train.csv"
-            ],
-            "fileOutputs": [
-                "X_train.csv",
-                "y_train.csv",
-                "X_test.csv",
-                "y_test.csv"
-            ]
-        },
-        {
-            "name": "train_model",
-            "description": "Train the machine learning model",
-            "runAfter": "data_prep",
-            "entrypoint": "python train_model.py",
-            "fileInputs": [
-                "X_train.csv",
-                "y_train.csv",
-                "X_test.csv",
-                "y_test.csv"
-            ],
-            "fileOutputs": [
-                "regressionTree",
-                "regressionLinear",
-                "randomForest"
-            ]
-        },
-        {
-            "name": "evaluate",
-            "description": "Evaluates the metrics",
-            "runAfter": "train_model",
-            "entrypoint": "python evaluate.py",
-            "fileInputs": [
-                "X_train.csv",
-                "y_train.csv",
-                "X_test.csv",
-                "y_test.csv",
-                "regressionTree",
-                "regressionLinear",
-                "randomForest"
-            ]
-        }
-    ]
+        "name": "acquisitor",
+        "description": "Acquisitor",
+        "entrypoint": "python acquisitor.py",
+        "envVars": [{
+            "key": "MY_ENV_VAR",
+            "value": "test_specific_env"
+        }],
+        "fileInputs": ["test.csv", "train.csv"],
+        "image": "python:3.7"
+    }, {
+        "name": "data_prep",
+        "description": "Data preparator",
+        "runAfter": "acquisitor",
+        "entrypoint": "python data_prep.py",
+        "fileInputs": ["test.csv", "train.csv", "data_prep.py"],
+        "fileOutputs": ["X_train.csv", "y_train.csv", "X_test.csv", "y_test.csv"],
+        "image": "python:3.7"
+    }, {
+        "name": "train_model",
+        "description": "Train the machine learning model",
+        "runAfter": "data_prep",
+        "entrypoint": "python train_model.py",
+        "fileInputs": ["X_train.csv", "y_train.csv", "X_test.csv", "y_test.csv", "train_model.py"],
+        "fileOutputs": ["regressionTree", "regressionLinear", "randomForest"],
+        "image": "python:3.7"
+    }, {
+        "name": "evaluate",
+        "description": "Evaluates the metrics",
+        "runAfter": "train_model",
+        "entrypoint": "python evaluate.py",
+        "fileInputs": ["X_train.csv", "y_train.csv", "X_test.csv", "y_test.csv", "regressionTree", "regressionLinear", "randomForest", "evaluate.py"],
+        "image": "python:3.7"
+    }]
 }

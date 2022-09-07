@@ -23,8 +23,8 @@ defaultParams:
         - evaluate.py
     globalFiles:
         - requirements.txt
-    envFile:
-        .env
+    envFile: .env
+    image: python:3.7
     # gettings parameters from:
     # https://kubeflow-pipelines.readthedocs.io/en/latest/source/kfp.client.html
     runParams:
