@@ -52,20 +52,18 @@ class Parser(MarvinBase):
     def spread_values_from_default(self):
         '''
         Spreads / copies values from 'defaultParams' to 'pipelineSteps'.
-        Example: Specified docker image is copied from defaultParams to each pipeline step
-        if not already specified in pipeline step.
+        Example: Specified docker image is copied from defaultParams to each pipeline step.
         '''
-        self._spread_values('image', False)
+        self._spread_values('image', overwrite=False)
 
     def _spread_values(self, value_key, overwrite=False):
         '''
         Spreads / copies values from 'defaultParams' to 'pipelineSteps'.
-        Example: Specified docker image is copied from defaultParams to each pipeline step
-        if not already specified in pipeline step.
+        Example: Specified docker image is copied from defaultParams to each pipeline step.
 
         Args:
-            - value_key (str) : key to have its contents copied to every pipeline step
-                that does NOT have that key specified.
+            - value_key (str) : key to have its contents copied to every pipeline step.
+            - overwrite (bool) : If True will overwrite existing values in pipeline steps.
         '''
 
         if value_key == 'envVars':
@@ -77,7 +75,7 @@ class Parser(MarvinBase):
                 default_value = v
 
         for i, step in enumerate(self.yaml['pipelineSteps']):
-            if value_key not in step or overwrite:
+            if overwrite or value_key not in step:
                 self.yaml['pipelineSteps'][i][value_key] = default_value
 
     def insert_env_file_in_pipe(self):

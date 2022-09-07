@@ -43,6 +43,7 @@ pipelineSteps:
       fileInputs:
         - test.csv
         - train.csv
+      image: python:3.8
 
     - name: data_prep
       description: Data preparator
