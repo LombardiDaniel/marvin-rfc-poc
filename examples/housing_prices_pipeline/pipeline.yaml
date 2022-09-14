@@ -37,6 +37,10 @@ pipelineSteps:
     - name: acquisitor
       description: Acquisitor
       entrypoint: python acquisitor.py
+      GPUs:
+        gpuLimit: 2  # optional
+        nodeSelector:  # optional
+            cloud.google.com/gke-accelerator: nvidia-tesla-p4
       envVars:
         - MY_ENV_VAR: test_specific_env
       fileInputs:
@@ -48,6 +52,10 @@ pipelineSteps:
       description: Data preparator
       runAfter: acquisitor
       entrypoint: python data_prep.py
+      TPUs:
+        tpu_cores: 8
+        tpu_resource: 'v2'
+        tf_version: '1.12'
       fileInputs:
         - test.csv
         - train.csv

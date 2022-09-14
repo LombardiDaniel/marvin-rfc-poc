@@ -24,6 +24,8 @@ class Parser(MarvinBase):
             yaml attribute.
         - self.fix_all_key_values(): Wrapper for Utils.fix_key_values() for user
             defined pipelines.
+        - self.generate_gpu_and_tpu_specs(): Generates the specs used in by the
+            ContainerWrapper for performance/resource specifications in containerOp creation.
     '''
 
     @property
@@ -43,6 +45,7 @@ class Parser(MarvinBase):
 
         self.insert_env_file_in_pipe()
         self.spread_values_from_default()
+        self.generate_gpu_and_tpu_specs()
 
     def check_yaml(self):
         '''
@@ -55,6 +58,28 @@ class Parser(MarvinBase):
         Example: Specified docker image is copied from defaultParams to each pipeline step.
         '''
         self._spread_values('image', overwrite=False)
+
+    def generate_gpu_and_tpu_specs(self):
+        '''
+        Checks pipeline steps for 'GPUs' and 'TPUs' keys, if they are present, generates
+        the appropriate keys to be used in the ContainerWrapper.
+        '''
+
+        for i, step in enumerate(self.yaml['pipelineSteps']):
+            if 'GPUs' in step:
+                self.yaml[i]['gpu_spec'] = {
+                    'gpuLimit': step['gpuLimit']
+                }
+
+                if 'nodeSelector' in step:
+                    for k, v in step['nodeSelector'].items():
+                        self.yaml[i]['gpu_obj'].update({
+                            'label_name': k,
+                            'value': v
+                        })
+
+            if 'TPUs' in step:
+                self.yaml[i]['tpu_spec'] = self.yaml[i]['TPUs']
 
     def _spread_values(self, value_key, overwrite=False):
         '''

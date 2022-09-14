@@ -104,6 +104,9 @@ def {{ make_step_function_name(step.name) }}():
     {% for env_var in step.envVars %}
         {{ env_var.key }}='{{ env_var.value }}',
     {% endfor %}
+    {% if step.gpu_spec %}
+        gpu_spec={{ step.gpu_spec }},
+    {% endif %}
     )
     container.name = '{{ step.name }}'
 

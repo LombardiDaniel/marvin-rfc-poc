@@ -2,7 +2,7 @@
 Containes a wrapper for dsl.ContainerOp. This should be used instead.
 '''
 
-from kfp import dsl
+from kfp import dsl, gcp
 from kubernetes.client.models import V1EnvVar
 
 
@@ -46,6 +46,8 @@ class ContainerWrapper:
                  setup_command='pip install -r requirements.txt',
                  verbose=False,
                  env_vars={},
+                 gpu_spec=None,
+                 tpu_spec=None,
                  **kwargs
                  ):
 
@@ -57,8 +59,12 @@ class ContainerWrapper:
         self.name = name
         self.verbose = verbose
         self.usr_setup = setup_command
+        self.gpu_spec = gpu_spec
+        self.tpu_spec = tpu_spec
 
-        # TODO: Explicar pq isso precisa ta aqui
+        # We need to explicitly (use `export` bash command) on cases the envVar
+        # is convertable to a number. This is to circumvent an error in kfp,
+        # thus we use this self.export attribute
         for k, v in self.env_vars.items():
             try:
                 float(v)
@@ -120,6 +126,22 @@ class ContainerWrapper:
                 '/bin/sh', '-c', final_command
             ]
         )
+
+        if self.gpu_spec is not None:
+            container_op.set_gpu_limit(self.gpu_spec['gpuLimit'])
+
+            if 'label_name' in self.gpu_spec:  # if 'label_name' is in the spec, value is too
+                container_op.add_node_selector_constraint(
+                    self.gpu_spec['label_name'],
+                    self.gpu_spec['value']
+                )
+
+        if self.tpu_spec is not None:
+            container_op.apply(gcp.use_tpu(
+                tpu_cores=self.tpu_spec['tpu_cores'],
+                tpu_resource=self.tpu_spec['tpu_resource'],
+                tf_version=self.tpu_spec['tf_version']
+            ))
 
         for k, v in self.env_vars.items():
             container_op.container.add_env_variable(
