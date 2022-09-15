@@ -1,13 +1,53 @@
 #!/usr/bin/env python3
 
-import yaml
+import os
+from tabnanny import check
+import click
 from marvin.dsl.parser import Parser
 from marvin.dsl.renderer import Renderer
+from marvin.utils import generate_project, make_tarball
+from marvin.utils import check_marvin_package, get_project_name
+from marvin.utils import Config
 
-if __name__ == "__main__":
-    with open('pipeline.yaml') as f:
-        yaml_s = yaml.safe_load(f.read())
-        p = Parser(user_defined_yaml=yaml_s)
-        r = Renderer(p.yaml, 'untitled')
-        r.parsed_yaml
-        r.render('pipe.py')
+#if __name__ == "__main__":
+#    with open('pipeline.yaml') as f:
+#        yaml_s = yaml.safe_load(f.read())
+#        p = Parser(user_defined_yaml=yaml_s)
+#        r = Renderer(p.yaml, 'untitled')
+#        r.parsed_yaml
+#        r.render('pipe.py')
+
+@click.group()
+@click.version_option()
+def cli():
+    """
+    Marvin DSL PoC
+    """
+
+#generate
+@cli.group()
+def project():
+    """Manages projects."""
+
+
+@project.command("generate")
+@click.option('--name', '-n', help='Project name.', type=str)
+@click.option('--version', '-v', default='0.0.1', help='Initial version.', type=str)
+def generate(name, version):
+    generate_project(name, version, os.getcwd())
+
+#compile
+
+#run
+@project.command("run")
+def run():
+    base_path = os.getcwd()
+    if check_marvin_package(base_path):
+        project_name = get_project_name(base_path)
+        make_tarball(project_name, base_path)
+    else:
+        conf = Config()
+        print(conf.kfp_url)
+        
+
+project()

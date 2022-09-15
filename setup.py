@@ -6,5 +6,6 @@ setup(
     name="mdsl",
     version="0.0.1",
     packages=find_packages(),
-    scripts=['marvin/bin/mdsl']
+    scripts=['marvin/bin/mdsl'],
+    include_package_data=True
 )

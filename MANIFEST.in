@@ -1,0 +1,2 @@
+recursive-include marvin/templates/lang/ *
+recursive-include marvin/templates/project/ *

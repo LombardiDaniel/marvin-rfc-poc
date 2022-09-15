@@ -7,8 +7,11 @@
 
 
 ### To-do
-Utilizar por click_
-
+[] click cli
+[] project template
+[] test KFP
+[] kserve
+[] local environment
 
 
 

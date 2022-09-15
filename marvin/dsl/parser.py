@@ -4,8 +4,6 @@ Parser to generate JSON/dict from user defined YAML.
 
 import os
 
-from marvin.utils.utils import Utils
-
 
 class Parser():
     '''
@@ -109,21 +107,21 @@ class Parser():
                 }
 
         # then we fix the vars
-        for i, item in enumerate(self.yaml['defaultParams']['dependencies']):
-            self.yaml['defaultParams']['dependencies'][i] = Utils.fix_key_values(
-                item
-            )
+ #       for i, item in enumerate(self.yaml['defaultParams']['dependencies']):
+ #           self.yaml['defaultParams']['dependencies'][i] = Utils.fix_key_values(
+ #               item
+ #           )
 
-        # Fix defaultParams envVars
-        for i, item in enumerate(self.yaml['defaultParams']['envVars']):
-            self.yaml['defaultParams']['envVars'][i] = Utils.fix_key_values(
-                item
-            )
+#        # Fix defaultParams envVars
+#        for i, item in enumerate(self.yaml['defaultParams']['envVars']):
+#            self.yaml['defaultParams']['envVars'][i] = Utils.fix_key_values(
+#                item
+#            )
 
-        # Fix pipelineSteps envVars
-        for i, step in enumerate(self.yaml['pipelineSteps']):
-            if 'envVars' in step:
-                for j, item in enumerate(step['envVars']):
-                    self.yaml['pipelineSteps'][i]['envVars'][j] = Utils.fix_key_values(
-                        item
-                    )
+#        # Fix pipelineSteps envVars
+#        for i, step in enumerate(self.yaml['pipelineSteps']):
+#            if 'envVars' in step:
+#                for j, item in enumerate(step['envVars']):
+#                    self.yaml['pipelineSteps'][i]['envVars'][j] = Utils.fix_key_values(
+#                        item
+#                    )

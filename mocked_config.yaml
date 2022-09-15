@@ -1,0 +1,6 @@
+backend:
+  kfp_url: "kfp.ai.b2w.io"
+storage:
+  s3_url: "minio.ai.b2w.io"
+  s3_access_key: "minio"
+  s3_secret_key: "minio123"
