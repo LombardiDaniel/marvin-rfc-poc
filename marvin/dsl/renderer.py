@@ -66,6 +66,21 @@ class Renderer:
         '''
         return pipeline_name + Renderer.PIPELINE_FUNCTION_SUFFIX
 
+    @staticmethod
+    def string_or_var(var):
+        '''
+        Helper function to allow passtrhough of extra/optional parameters for
+        kfp run creations. More info on:
+            https://kubeflow-pipelines.readthedocs.io/en/latest/source/kfp.client.html#create_run_from_pipeline_package
+        Returns either None or str(var).
+        '''
+
+        if not isinstance(var, str):
+            return var
+
+        return f'"{str(var)}"'
+
+
     def render(self, target_path=None, auto_format=True):
         '''
         Renders the pipeline file. It also containes the needed files for

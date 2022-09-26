@@ -1,0 +1,49 @@
+apiVersion: v1-alpha
+#plugin: python
+pipelineName: marvin-test
+description: Apache Marvin-AI DASFE pipeline
+
+defaultParams:
+    storageBucket: marvin-pipelines
+    setupCommand: pip install -r requirements.txt
+    image: python:3.7-buster
+    envVars:
+        - PIPELINE_NAME: marvin-test
+    dependencies:
+        - meta.dt
+    globalFiles:
+        - requirements.txt
+    envFile:
+        .env
+
+pipelineSteps:
+    - name: acquisitor
+      description: Acquisitor
+      entrypoint: python3 runner.py --action Acquisitor
+      envVars:
+        - MY_ENV_VAR: test_specific_env
+      fileInputs:
+        - train.csv
+      fileOutputs:
+
+    - name: tpreparator
+      description: Training preparator
+      runAfter: acquisitor
+      entrypoint: python3 runner.py --action TPreparator
+      fileInputs:
+      fileOutputs:
+
+    - name: trainer
+      description: Trainer
+      image: pytorch:latest
+      runAfter: tpreparator
+      entrypoint: python3 runner.py --action Trainer
+      fileInputs:
+      fileOutputs:
+
+    - name: evaluator
+      description: Evaluator
+      runAfter: trainer
+      entrypoint: python3 runner.py --action Evaluator
+      fileInputs:
+      fileOutputs:
