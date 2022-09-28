@@ -22,9 +22,7 @@ from .misc import filter_tar
 
 
 MARVIN_PATH = os.getenv('MARVIN_PATH', '~/usr/bin/marvin')
-USR_TEMPLATES_DIR = os.path.join(MARVIN_PATH, 'project_templates')
-MARVIN_TEMPLATE_OPTIONS = os.listdir(USR_TEMPLATES_DIR)
-PYTHON3_PATH = os.path.join(site.getsitepackages()[0].split('/lib/python3.')[0], '/bin/python3')
+PYTHON3_PATH = os.path.join(site.getsitepackages()[0].split('/lib/python')[0], '/bin/python3')
 
 
 def generate_project(name, version, output_dir):
@@ -69,24 +67,24 @@ class ProjectTools:
         self.project_dir = project_dir
         self.uuid = uuid4()
 
-    # def init_project(self, template, project_name, force_overwrite):
-    #     '''
-    #     Initializes the project, will use cookiecutter in the future, as of now
-    #     simply copies the '.marvin' file into the project dir and populates base
-    #     fields.
-    #     '''
-    #     template_src = os.path.join(USR_TEMPLATES_DIR, template)
-    #
-    #     # lst = [item for item in os.listdir(USR_TEMPLATES_DIR) if os.path.isdir(item)]
-    #
-    #     if template not in os.listdir(USR_TEMPLATES_DIR):
-    #         raise MarvinTemplateNotFoundError(
-    #             f'Template "{template}" not in "{USR_TEMPLATES_DIR}".'
-    #         )
-    #
-    #     Utils.copy_dir_from_template(template_src, self.project_dir, force_overwrite)
-    #
-    #     self.setup_marvin_base_file(project_name)
+    def init_project(self, name, version):
+        '''
+        Initializes the project dir.
+        '''
+        template_ctx = {
+            'project_name': name,
+            'version': version
+        }
+        template_path = os.path.join(
+                os.path.dirname(os.getenv('MARVIN_HOME')),
+                "templates/project"
+            )
+        cookiecutter(
+            template_path,
+            extra_context=template_ctx,
+            output_dir=self.project_dir,
+            no_input=True
+        )
 
 
     def _render_pipeline(self, usr_yaml, verbose, debug, *args, **kwargs):

@@ -4,7 +4,7 @@ Parser to generate JSON/dict from user defined YAML.
 
 import os
 
-from utils import Utils
+from marvin.utils.utils import Utils
 
 
 class Parser:

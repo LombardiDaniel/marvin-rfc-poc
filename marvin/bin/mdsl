@@ -15,7 +15,7 @@ from marvin.utils import Config, Utils
 
 
 MARVIN_PATH = os.getenv('MARVIN_PATH', '~/usr/bin/marvin')
-USR_TEMPLATES_DIR = os.path.join(MARVIN_PATH, 'project_templates')
+USR_TEMPLATES_DIR = os.path.join(MARVIN_PATH, 'marvin/templates/project')
 MARVIN_TEMPLATE_OPTIONS = os.listdir(USR_TEMPLATES_DIR)
 
 #if __name__ == "__main__":
@@ -60,12 +60,13 @@ def project():
     help='Initial version.',
     type=str
 )
-def generate(project_dir, verbose, template, name, force_overwrite):
+def generate(project_dir, verbose, template, name, force_overwrite, version):
     # generate_project(name, version, os.getcwd())
+    # TODO: template n ta sendo utilizado
     project_name = Utils.clean_dirname(name)
 
     m = ProjectTools(os.getcwd())
-    m.init_project(template, project_name, force_overwrite)
+    m.init_project(name, version)
 
 
 @cli.command("compile")
