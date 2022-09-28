@@ -201,6 +201,7 @@ if __name__ == '__main__':
         print(f"Bucket Path: '{bucket_path}'")
 
     if args.op == 'create_run':
+        {% if 'runParams' in pipeline.defaultParams %}
         client.create_run_from_pipeline_package(
             experiment_name=bucket_path,
             pipeline_file=pipeline_file_path,
@@ -212,8 +213,12 @@ if __name__ == '__main__':
                 {% endfor %}
             {% endif %}
         )
+        {% else %}
+        pass
+        {% endif %}
 
     elif args.op == 'create_recurring_run':
+        {% if 'recurringRunParams' in pipeline.defaultParams %}
         client.create_recurring_run(
             experiment_id=exp_obj.id,
             pipeline_package_path=pipeline_file_path,
@@ -225,3 +230,6 @@ if __name__ == '__main__':
                 {% endfor %}
             {% endif %}
         )
+        {% else %}
+        pass
+        {% endif %}

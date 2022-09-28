@@ -3,12 +3,20 @@
 
 import os
 from tabnanny import check
+
 import click
-from marvin.dsl.parser import Parser
-from marvin.dsl.renderer import Renderer
+
+from marvin.utils.project import ProjectTools
+from marvin.dsl import Parser
+from marvin.dsl import Renderer
 from marvin.utils import generate_project, make_tarball
 from marvin.utils import check_marvin_package, get_project_name
-from marvin.utils import Config
+from marvin.utils import Config, Utils
+
+
+MARVIN_PATH = os.getenv('MARVIN_PATH', '~/usr/bin/marvin')
+USR_TEMPLATES_DIR = os.path.join(MARVIN_PATH, 'project_templates')
+MARVIN_TEMPLATE_OPTIONS = os.listdir(USR_TEMPLATES_DIR)
 
 #if __name__ == "__main__":
 #    with open('pipeline.yaml') as f:
@@ -25,6 +33,7 @@ def cli():
     Marvin DSL PoC
     """
 
+
 #generate
 @cli.group()
 def project():
@@ -32,14 +41,140 @@ def project():
 
 
 @project.command("generate")
-@click.option('--name', '-n', help='Project name.', type=str)
-@click.option('--version', '-v', default='0.0.1', help='Initial version.', type=str)
-def generate(name, version):
-    generate_project(name, version, os.getcwd())
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option(
+    '--project_dir',
+    type=click.Path(exists=True),
+    default=os.getcwd()
+)
+@click.option(
+    '--name',
+    '-n',
+    help='Project name.',
+    type=str
+)
+@click.option(
+    '--version',
+    '-v',
+    default='0.0.1',
+    help='Initial version.',
+    type=str
+)
+def generate(project_dir, verbose, template, name, force_overwrite):
+    # generate_project(name, version, os.getcwd())
+    project_name = Utils.clean_dirname(name)
 
-#compile
+    m = ProjectTools(project_dir)
+    m.init_project(template, project_name, force_overwrite)
 
-#run
+
+@cli.command("compile")
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def compile(pipeline_file, verbose, debug):
+    """
+    Compiles the pipeline.
+    """
+
+    m = ProjectTools()
+    m.compile_pipeline(pipeline_file, verbose, debug)
+
+
+@cli.command("incremental_create_storage_bucket")
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def incremental_create_storage_bucket(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = ProjectTools()
+    m.create_bucket(pipeline_file, verbose, debug)
+
+
+@cli.command("incremental_prepare_env")
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def incremental_prepare_env(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = ProjectTools()
+    m.prepare_env(pipeline_file, verbose, debug)
+
+
+@cli.command()
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def incremental_crete_run(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = ProjectTools()
+    m.create_run(pipeline_file, verbose, debug)
+
+
+
+@cli.command("incremental_crete_recurring_run")
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def incremental_crete_recurring_run(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = ProjectTools()
+    m.create_recurring_run(pipeline_file, verbose, debug)
+
+
+@cli.command("compile_and_run")
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def compile_and_run(pipeline_file, verbose, debug):
+    '''
+    '''
+
+    m = ProjectTools()
+    m.compile_pipeline(pipeline_file, verbose, debug)
+    m.create_bucket(pipeline_file, verbose, debug)
+    m.prepare_env(pipeline_file, verbose, debug)
+    m.create_run(pipeline_file, verbose, debug)
+    m.create_recurring_run(pipeline_file, verbose, debug)
+
 @project.command("run")
 def run():
     base_path = os.getcwd()
@@ -49,6 +184,6 @@ def run():
     else:
         conf = Config()
         print(conf.kfp_url)
-        
+
 
 project()
