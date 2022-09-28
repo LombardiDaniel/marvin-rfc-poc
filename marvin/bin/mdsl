@@ -11,7 +11,7 @@ from marvin.dsl import Parser
 from marvin.dsl import Renderer
 from marvin.utils import generate_project, make_tarball
 from marvin.utils import check_marvin_package, get_project_name
-from marvin.utils import Config, Utils
+from marvin.utils.utils import Config, Utils
 
 
 MARVIN_PATH = os.getenv('MARVIN_PATH', '~/usr/bin/marvin')
