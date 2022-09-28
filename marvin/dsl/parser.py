@@ -4,7 +4,6 @@ Parser to generate JSON/dict from user defined YAML.
 
 import os
 
-from marvin_base import MarvinBase, MarvinDefaults
 from utils import Utils
 
 
