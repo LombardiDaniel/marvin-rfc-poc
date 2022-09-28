@@ -64,7 +64,7 @@ def generate(project_dir, verbose, template, name, force_overwrite):
     # generate_project(name, version, os.getcwd())
     project_name = Utils.clean_dirname(name)
 
-    m = ProjectTools(project_dir)
+    m = ProjectTools(os.getcwd())
     m.init_project(template, project_name, force_overwrite)
 
 
@@ -82,7 +82,7 @@ def compile(pipeline_file, verbose, debug):
     Compiles the pipeline.
     """
 
-    m = ProjectTools()
+    m = ProjectTools(os.getcwd())
     m.compile_pipeline(pipeline_file, verbose, debug)
 
 
@@ -99,7 +99,7 @@ def incremental_create_storage_bucket(pipeline_file, verbose, debug):
     '''
     '''
 
-    m = ProjectTools()
+    m = ProjectTools(os.getcwd())
     m.create_bucket(pipeline_file, verbose, debug)
 
 
@@ -116,7 +116,7 @@ def incremental_prepare_env(pipeline_file, verbose, debug):
     '''
     '''
 
-    m = ProjectTools()
+    m = ProjectTools(os.getcwd())
     m.prepare_env(pipeline_file, verbose, debug)
 
 
@@ -133,7 +133,7 @@ def incremental_crete_run(pipeline_file, verbose, debug):
     '''
     '''
 
-    m = ProjectTools()
+    m = ProjectTools(os.getcwd())
     m.create_run(pipeline_file, verbose, debug)
 
 
@@ -151,7 +151,7 @@ def incremental_crete_recurring_run(pipeline_file, verbose, debug):
     '''
     '''
 
-    m = ProjectTools()
+    m = ProjectTools(os.getcwd())
     m.create_recurring_run(pipeline_file, verbose, debug)
 
 
@@ -168,12 +168,13 @@ def compile_and_run(pipeline_file, verbose, debug):
     '''
     '''
 
-    m = ProjectTools()
+    m = ProjectTools(os.getcwd())
     m.compile_pipeline(pipeline_file, verbose, debug)
     m.create_bucket(pipeline_file, verbose, debug)
     m.prepare_env(pipeline_file, verbose, debug)
     m.create_run(pipeline_file, verbose, debug)
     m.create_recurring_run(pipeline_file, verbose, debug)
+
 
 @project.command("run")
 def run():

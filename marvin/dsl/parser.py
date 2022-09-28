@@ -8,7 +8,7 @@ from marvin_base import MarvinBase, MarvinDefaults
 from utils import Utils
 
 
-class Parser(MarvinBase):
+class Parser:
     '''
     Parser class is responsible to transform the user defined pipeline.yaml file
     into the expected json (in-memory dict obj) to be forwarded to the renderer.
