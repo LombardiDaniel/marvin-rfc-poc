@@ -164,7 +164,7 @@ if __name__ == '__main__':
     setup_storage_pipeline_dependencies(
         [
             {% for file_struct in pipeline.defaultParams.dependencies %}
-            {{ file_struct }},
+            "dependencies/{{ file_struct }}",
             {% endfor %}
         ]
     )

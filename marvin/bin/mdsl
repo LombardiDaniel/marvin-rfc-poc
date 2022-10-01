@@ -49,7 +49,8 @@ def project():
     '--name',
     '-n',
     help='Project name.',
-    type=str
+    type=str,
+    default=os.path.dirname(os.getcwd())
 )
 @click.option(
     '--version',
