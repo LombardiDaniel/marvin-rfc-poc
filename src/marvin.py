@@ -110,12 +110,15 @@ class Marvin(MarvinBase):
         Compiles using the subprocess module.
         '''
 
-        final_command = f'{self.python3_path} {self.pipeline_py} compile_pipeline -h "{self.uuid}"'
-
+        final_command = f'export PYTHONPATH=$PYTHONPATH:{MARVIN_PATH} && '
+        final_command += f'{self.python3_path} {self.pipeline_py} compile_pipeline --hash "{self.uuid}"'
+        # print(final_command)
         try:
+            # print(MARVIN_PATH)
             subprocess.run(
                 ['/bin/sh', '-c', final_command],
-                check=True
+                check=True,
+                # cwd=MARVIN_PATH
             )
         except subprocess.CalledProcessError as exp:
             click.prompt(f'{exp}::Error in Compiling pipeline: "{self.pipeline_py}"')
@@ -125,12 +128,13 @@ class Marvin(MarvinBase):
         Compiles using the subprocess module.
         '''
 
-        final_command = f'{self.python3_path} {self.pipeline_py} create_bucket -h "{self.uuid}"'
+        final_command = f'export PYTHONPATH=$PYTHONPATH:{MARVIN_PATH} &&'
+        final_command += f'{self.python3_path} {self.pipeline_py} create_bucket --hash "{self.uuid}"'
 
         try:
             subprocess.run(
                 ['/bin/sh', '-c', final_command],
-                check=True
+                check=True,
             )
         except subprocess.CalledProcessError as exp:
             click.prompt(f'{exp}::Error in Creating Bucket from pipeline: "{self.pipeline_py}"')
@@ -140,12 +144,13 @@ class Marvin(MarvinBase):
         Compiles using the subprocess module.
         '''
 
-        final_command = f'{self.python3_path} {self.pipeline_py} prepare_env -h "{self.uuid}"'
+        final_command = f'export PYTHONPATH=$PYTHONPATH:{MARVIN_PATH} && '
+        final_command += f'{self.python3_path} {self.pipeline_py} prepare_env --hash "{self.uuid}"'
 
         try:
             subprocess.run(
                 ['/bin/sh', '-c', final_command],
-                check=True
+                check=True,
             )
         except subprocess.CalledProcessError as exp:
             click.prompt(
@@ -157,12 +162,13 @@ class Marvin(MarvinBase):
         Compiles using the subprocess module.
         '''
 
-        final_command = f'{self.python3_path} {self.pipeline_py} create_run -h "{self.uuid}"'
+        final_command = f'export PYTHONPATH=$PYTHONPATH:{MARVIN_PATH} && '
+        final_command += f'{self.python3_path} {self.pipeline_py} create_run --hash "{self.uuid}"'
 
         try:
             subprocess.run(
                 ['/bin/sh', '-c', final_command],
-                check=True
+                check=True,
             )
         except subprocess.CalledProcessError as exp:
             click.prompt(
@@ -174,12 +180,13 @@ class Marvin(MarvinBase):
         Compiles using the subprocess module.
         '''
 
-        final_command = f'{self.python3_path} {self.pipeline_py} create_recurring_run -h "{self.uuid}"'
+        final_command = f'export PYTHONPATH=$PYTHONPATH:{MARVIN_PATH} &&'
+        final_command += f'{self.python3_path} {self.pipeline_py} create_recurring_run --hash "{self.uuid}"'
 
         try:
             subprocess.run(
                 ['/bin/sh', '-c', final_command],
-                check=True
+                check=True,
             )
         except subprocess.CalledProcessError as exp:
             click.prompt(

@@ -184,10 +184,14 @@ class Parser(MarvinBase):
 
         keys = ['runParams', 'recurringRunParams']
         for key in keys:
-            for i, item in enumerate(self.yaml['defaultParams'][key]):
-                self.yaml['defaultParams'][key][i] = Utils.fix_key_values(
-                    self.yaml['defaultParams'][key][i]
-                )
+            if 'defaultParams' in self.yaml:
+                try:
+                    for i, item in enumerate(self.yaml['defaultParams'][key]):
+                        self.yaml['defaultParams'][key][i] = Utils.fix_key_values(
+                            self.yaml['defaultParams'][key][i]
+                        )
+                except KeyError:
+                    pass
 
         # Fix pipelineSteps envVars
         for i, step in enumerate(self.yaml['pipelineSteps']):

@@ -66,6 +66,8 @@ def init(project_dir, verbose, template, name, force_overwrite):
 def compile(pipeline_file, verbose, debug):
     '''
     '''
+    pipeline_file = os.path.abspath(pipeline_file)
+    print(pipeline_file)
 
     m = Marvin()
     m.compile_pipeline(pipeline_file, verbose, debug)
@@ -83,6 +85,7 @@ def compile(pipeline_file, verbose, debug):
 def incremental_create_bucket(pipeline_file, verbose, debug):
     '''
     '''
+    pipeline_file = os.path.abspath(pipeline_file)
 
     m = Marvin()
     m.create_bucket(pipeline_file, verbose, debug)
@@ -100,8 +103,29 @@ def incremental_create_bucket(pipeline_file, verbose, debug):
 def incremental_prepare_env(pipeline_file, verbose, debug):
     '''
     '''
+    pipeline_file = os.path.abspath(pipeline_file)
 
     m = Marvin()
+    m.prepare_env(pipeline_file, verbose, debug)
+
+
+@cli.command()
+@click.option(
+    '-f',
+    '--pipeline-file',
+    type=click.Path(exists=True),
+    default='pipeline.yaml'
+)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('-d', '--debug', is_flag=True, default=False)
+def compile_and_upload(pipeline_file, verbose, debug):
+    '''
+    '''
+    pipeline_file = os.path.abspath(pipeline_file)
+
+    m = Marvin()
+    m.compile_pipeline(pipeline_file, verbose, debug)
+    m.create_bucket(pipeline_file, verbose, debug)
     m.prepare_env(pipeline_file, verbose, debug)
 
 
@@ -117,6 +141,7 @@ def incremental_prepare_env(pipeline_file, verbose, debug):
 def incremental_crete_run(pipeline_file, verbose, debug):
     '''
     '''
+    pipeline_file = os.path.abspath(pipeline_file)
 
     m = Marvin()
     m.create_run(pipeline_file, verbose, debug)
@@ -134,6 +159,7 @@ def incremental_crete_run(pipeline_file, verbose, debug):
 def incremental_crete_recurring_run(pipeline_file, verbose, debug):
     '''
     '''
+    pipeline_file = os.path.abspath(pipeline_file)
 
     m = Marvin()
     m.create_recurring_run(pipeline_file, verbose, debug)
@@ -151,6 +177,7 @@ def incremental_crete_recurring_run(pipeline_file, verbose, debug):
 def compile_and_run(pipeline_file, verbose, debug):
     '''
     '''
+    pipeline_file = os.path.abspath(pipeline_file)
 
     m = Marvin()
     m.compile_pipeline(pipeline_file, verbose, debug)

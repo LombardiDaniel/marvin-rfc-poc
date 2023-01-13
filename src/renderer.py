@@ -135,6 +135,14 @@ class Renderer:
         '''
         return pipeline_name + Renderer.PIPELINE_FUNCTION_SUFFIX
 
+    # @staticmethod
+    # def make_tarball_name(yaml_path):
+    #     '''
+    #     Helper func
+    #     '''
+    #
+    #     orig_name = yaml_path
+
 
 # TODO: remover isso aqui e criar arquivo de test
 if __name__ == '__main__':

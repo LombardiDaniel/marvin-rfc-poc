@@ -80,12 +80,12 @@ class S3Utils:
 
         self.project_name = project_name
 
-        if S3Utils.is_valid_bucket_name(project_name):
-            self.bucket_name = bucket_name
-        else:
-            raise BaseException(
-                f'Invalid bucket name ("{bucket_name}"). Please check: https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html'  # noqa: E501
-            )
+        # if S3Utils.is_valid_bucket_name(project_name):
+        self.bucket_name = bucket_name
+        # else:
+        #     raise BaseException(
+        #         f'Invalid bucket name ("{bucket_name}"). Please check: https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html'  # noqa: E501
+        #     )
 
         self.bucket_path = bucket_path
 
@@ -144,11 +144,11 @@ class S3Utils:
 
         if try_new_hash:
             hash = secrets.token_hex(int(HASH_SIZE / 2))
-            bucket_name_tmp = f"{self.project_name}_{hash}"
+            bucket_name_tmp = f"{self.project_name}-{hash}"
 
             while client.bucket_exists(bucket_name_tmp):
                 hash = secrets.token_hex(int(HASH_SIZE / 2))
-                bucket_name_tmp = f"{self.project_name}_{hash}"
+                bucket_name_tmp = f"{self.project_name}-{hash}"
 
             self.bucket_name = bucket_name_tmp
 
@@ -176,7 +176,7 @@ class S3Utils:
         for char in invalid_lst:
             bucket_name = bucket_name.replace(char, '-')
 
-        return bucket_name
+        return bucket_name.replace('_', '-')
 
     @staticmethod
     def is_valid_bucket_name(bucket_name):
