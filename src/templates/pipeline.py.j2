@@ -182,7 +182,6 @@ if __name__ == '__main__':
 
     # OPERATIONS::
     if args.op == 'compile_pipeline':  # this op requests a new uuid
-        print('TARBALL', pipeline_file_path)
         kfp.compiler.Compiler().compile(
             {{ make_pipeline_function_name(pipeline.pipelineName) }},
             pipeline_file_path + '.tar.gz'
