@@ -1,19 +1,20 @@
 # marvin-rfc-poc
 
-### Useful links:
-- https://github.com/kubeflow/pipelines/tree/master/samples
-- https://click.palletsprojects.com/en/8.1.x/
-- https://github.com/apache/incubator-marvin/blob/develop/python-toolbox/marvin_python_toolbox/management/engine.py
+### Install
+Run from repo root:
+```sh
+echo 'export "MARVIN_PATH"="$(pwd)/src" && export PATH=$PATH:$MARVIN_PATH' >> ~/.bashrc
+```
 
+#### Usage example:
+On project folder:
+```sh
+marvin init
+```
 
-### To-do
-Utilizar por click_
+To compile and upload pipeline dependencies (after creation of pipeline.yaml):
+```sh
+marvin compile_and_upload -f piepeline.yaml
+```
 
-
-
-
-#### .mrvn-workflows
-
-.marvin
-
-ou .marvin-ignore
+next step: get tarball and upload to kfp

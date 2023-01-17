@@ -198,5 +198,6 @@ if __name__ == '__main__':
     #         ['/bin/sh', '-c', COMMAND]
     #     )
 
+# Current install from repo folder
 # from repo home folder:
-# export "MARVIN_PATH"="$(pwd)/src" && export PATH=$PATH:$MARVIN_PATH
+# echo 'export "MARVIN_PATH"="$(pwd)/src" && export PATH=$PATH:$MARVIN_PATH' >> ~/.bashrc
